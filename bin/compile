@@ -17,18 +17,6 @@ fi
 mkdir -p "$2"
 cd "$2"
 
-# Create a dummy version of git, because some Rust libraries have Makefiles
-# that set up submodules even when they're already there.
-mkdir -p tools
-cat > ./tools/git << 'EOF'
-#!/bin/sh
-echo "WARNING: Skipping git command: git" "$@"
-echo "WARNING: Please fix your Makefile to not call git when not inside"
-echo "WARNING: a git checkout.  This feature will go away soon."
-EOF
-chmod +x ./tools/git
-PATH="$2/tools:$PATH"
-
 # Make sure we have the C++ runtime libraries required by the Rust nightly
 # builds.
 if [ -f lib/libstdc++.so.6.0.18 ]; then
