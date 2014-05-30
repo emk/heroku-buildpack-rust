@@ -38,6 +38,7 @@ else
   tar xzvf rust-support.tar.gz
 fi
 LD_LIBRARY_PATH="$2/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
 
 # Make sure we have the correct Rust binaries and set up PATH.
 if [ -d rust-cache-$VERSION ]; then
