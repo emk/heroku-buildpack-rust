@@ -13,9 +13,19 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Make sure we have the correct Rust binaries and set up PATH.
+# Switch to our cache directory.
 mkdir -p "$2"
 cd "$2"
+
+# Create a dummy version of git
+mkdir tools
+cat > ./tools/git <<EOF
+#!/bin/sh
+echo "Skipping git command:" "$@"
+EOF
+chmod +x ./tools/git
+
+# Make sure we have the correct Rust binaries and set up PATH.
 if [ -d rust-cache-$VERSION ]; then
   echo "-----> Using Rust version $VERSION"
 else
@@ -36,7 +46,7 @@ if [ ! -x "$rust_path/rustc" ]; then
     echo "failed: Cannot find rust binaries at $rust_path"
     exit 1
 fi
-PATH="$rust_path:$PATH"
+PATH="$rust_path:$2/tools:$PATH"
 
 # Build the actual application.
 echo "-----> Building application"
