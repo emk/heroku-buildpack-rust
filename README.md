@@ -4,4 +4,5 @@ recent Rust nightly builds.  For detailed instructions, please see
 [Deploying Rust applications to Heroku][instructions], which explains how
 to get everything working.
 
+[fode]: https://github.com/ericfode/heroku-buildpack-rust
 [instructions]: http://www.randomhacks.net/2014/05/30/rust-heroku-rustful/
