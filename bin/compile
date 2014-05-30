@@ -22,7 +22,9 @@ cd "$2"
 mkdir -p tools
 cat > ./tools/git << 'EOF'
 #!/bin/sh
-echo "Skipping git command: git" "$@"
+echo "WARNING: Skipping git command: git" "$@"
+echo "WARNING: Please fix your Makefile to not call git when not inside"
+echo "WARNING: a git checkout.  This feature will go away soon."
 EOF
 chmod +x ./tools/git
 PATH="$2/tools:$PATH"
