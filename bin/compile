@@ -17,8 +17,9 @@ fi
 mkdir -p "$2"
 cd "$2"
 
-# Create a dummy version of git
-mkdir tools
+# Create a dummy version of git, because some Rust libraries have Makefiles
+# that set up submodules even when they're already there.
+mkdir -p tools
 cat > ./tools/git << 'EOF'
 #!/bin/sh
 echo "Skipping git command: git" "$@"
@@ -26,50 +27,40 @@ EOF
 chmod +x ./tools/git
 PATH="$2/tools:$PATH"
 
+# Make sure we have the C++ runtime libraries required by the Rust nightly
+# builds.
+if [ -f lib/libstdc++.so.6.0.18 ]; then
+  echo "-----> Using libstdc++.so.6.0.18"
+else
+  echo "-----> Downloading rust-support"
+  rm -rf lib
+  curl -O https://s3.amazonaws.com/rust-builds/rust-support.tar.gz
+  tar xzvf rust-support.tar.gz
+fi
+LD_LIBRARY_PATH="$2/lib:$LD_LIBRARY_PATH"
+
 # Make sure we have the correct Rust binaries and set up PATH.
-#if [ -d rust-cache-$VERSION ]; then
-#  echo "-----> Using Rust version $VERSION"
-#else
-#  echo "-----> Downloading Rust version $VERSION binaries from $URL"
-#
-#  rm -f rust.tar.gz
-#  rm -rf rust-cache-*
-#  curl -o rust.tar.gz "$URL"
-#
-#  echo "-----> Extracting Rust binaries"
-#
-#  mkdir rust-cache-$VERSION
-#  tar xzf rust.tar.gz -C rust-cache-$VERSION
-#  rm -r rust.tar.gz
-#fi
-#rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/bin"`
-#if [ ! -x "$rust_path/rustc" ]; then
-#    echo "failed: Cannot find rust binaries at $rust_path"
-#    exit 1
-#fi
-#PATH="$rust_path:$PATH"
+if [ -d rust-cache-$VERSION ]; then
+  echo "-----> Using Rust version $VERSION"
+else
+  echo "-----> Downloading Rust version $VERSION binaries from $URL"
 
-echo "-----> Installing support packages"
+  rm -f rust.tar.gz
+  rm -rf rust-cache-*
+  curl -o rust.tar.gz "$URL"
 
-sudo sh -c 'echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu lucid main\ndeb-src http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu lucid main\n" > /etc/apt/sources.list.d/toolchain.list'
-gpg --keyserver wwwkeys.pgp.net --recv-keys 1E9377A2BA9EF27F
-gpg --armor --export 1E9377A2BA9EF27F | sudo apt-key add -
-sudo apt-get update
-sudo apt-get -y install libstdc++6
+  echo "-----> Extracting Rust binaries"
 
-echo "-----> Downloading Rust binaries"
-
-curl -o rust.tar.gz https://s3.amazonaws.com/rust-builds/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-
-echo "-----> Extracting Rust binaries"
-
-tar xzf rust.tar.gz
-cd rust-nightly-x86_64-unknown-linux-gnu/
-
-echo "-----> Installing Rust binaries"
-
-sudo ./install.sh
-rm -rf rust.tar.gz rust-nightly-x86_64-unknown-linux-gnu/
+  mkdir rust-cache-$VERSION
+  tar xzf rust.tar.gz -C rust-cache-$VERSION
+  rm -r rust.tar.gz
+fi
+rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/bin"`
+if [ ! -x "$rust_path/rustc" ]; then
+    echo "failed: Cannot find rust binaries at $rust_path"
+    exit 1
+fi
+PATH="$rust_path:$PATH"
 
 # Build the actual application.
 echo "-----> Building application"
