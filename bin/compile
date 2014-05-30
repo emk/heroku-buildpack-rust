@@ -14,6 +14,7 @@ if [ -z "$VERSION" ]; then
 fi
 
 # Make sure we have the correct Rust binaries and set up PATH.
+mkdir -p "$2"
 cd "$2"
 if [ -d rust-cache-$VERSION ]; then
   echo "-----> Using Rust version $VERSION"
