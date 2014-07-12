@@ -25,15 +25,6 @@ if [ -f "$1/Cargo.toml" ]; then
   fi
 fi
 
-# Report our environment.
-echo "-----> Checking environment"
-echo "Our env"
-env
-echo "Our /app"
-ls -la /app
-echo "Our env dir:"
-ls -la "$3"
-
 # Switch to our cache directory.
 mkdir -p "$2"
 cd "$2"
@@ -100,8 +91,7 @@ if [ -f "$1/Cargo.toml" ]; then
   PATH="$cargo_path:$PATH"
 
   # Make sure we have a fake home directory for the Cargo cache.
-  cargo_home="$2/cargo-home-$CARGO_VERSION"
-  mkdir -p "$cargo_home"
+  cargo_home="$(mktemp -t cargo_XXXX)"
 
   # Build the actual application using Cargo.
   echo "-----> Building application using Cargo"
