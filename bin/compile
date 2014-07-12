@@ -13,6 +13,18 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+# Check our Cargo configuration options if we have Cargo.toxml.
+if [ -f "$1/Cargo.toml" ]; then
+  if [ -z "$CARGO_URL" ]; then
+    echo "failed: RustConfig must set CARGO_URL to point to a Cargo binary tarball."
+    exit 1
+  fi
+  if [ -z "$CARGO_VERSION" ]; then
+    echo "failed: RustConfig must set CARGO_VERSION to indicate the Cargo version."
+    exit 1
+  fi
+fi
+
 # Switch to our cache directory.
 mkdir -p "$2"
 cd "$2"
@@ -46,14 +58,45 @@ else
   tar xzf rust.tar.gz -C rust-cache-$VERSION
   rm -r rust.tar.gz
 fi
-rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/bin"`
-if [ ! -x "$rust_path/rustc" ]; then
-    echo "failed: Cannot find rust binaries at $rust_path"
+rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
+if [ ! -x "$rust_path/bin/rustc" ]; then
+    echo "failed: Cannot find rust binaries at $rust_path/bin"
     exit 1
 fi
-PATH="$rust_path:$PATH"
+PATH="$rust_path/bin:$PATH"
+LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+echo $LD_LIBRARY_PATH
 
-# Build the actual application.
-echo "-----> Building application"
-cd "$1"
-make
+if [ -f "$1/Cargo.toml" ]; then
+  if [ -d cargo-cache-$CARGO_VERSION ]; then
+    echo "-----> Using Cargo version $CARGO_VERSION"
+  else
+    echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
+
+    rm -f cargo.tar.gz
+    rm -rf cargo-cache-*
+    curl -o cargo.tar.gz "$CARGO_URL"
+
+    echo "-----> Extracting Cargo binaries"
+
+    mkdir cargo-cache-$CARGO_VERSION
+    tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
+    rm -r cargo.tar.gz
+  fi
+  cargo_path=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
+  if [ ! -x "$cargo_path/cargo" ]; then
+      echo "failed: Cannot find cargo binaries at $cargo_path"
+      exit 1
+  fi
+  PATH="$cargo_path:$PATH"
+
+  # Build the actual application using Cargo.
+  echo "-----> Building application using Cargo"
+  cd "$1"
+  cargo build --verbose
+else
+  # Build the actual application using Make.
+  echo "-----> Building application using Make"
+  cd "$1"
+  make
+fi
