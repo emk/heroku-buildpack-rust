@@ -94,10 +94,13 @@ if [ -f "$1/Cargo.toml" ]; then
   cargo_home="$2/cargo-home-$CARGO_VERSION"
   mkdir -p "$cargo_home"
 
+  # Disable SSL verification.
+  git config --global http.sslVerify false
+
   # Build the actual application using Cargo.
   echo "-----> Building application using Cargo"
   cd "$1"
-  HOME="$cargo_home" GIT_SSL_NO_VERIFY=true cargo build --verbose
+  HOME="$cargo_home" cargo build --verbose
 else
   # Build the actual application using Make.
   echo "-----> Building application using Make"
