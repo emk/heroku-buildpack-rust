@@ -90,8 +90,10 @@ if [ -f "$1/Cargo.toml" ]; then
   fi
   PATH="$cargo_path:$PATH"
 
-  # Make sure we have a fake home directory for the Cargo cache.
-  cargo_home="$(mktemp -t cargo_XXXX)"
+  # Make sure we have a fake home directory for the Cargo cache.  Ideally
+  # we would keep these in our cache, but our ".git" directories don't
+  # survive between builds.
+  cargo_home="$(mktemp -d -t cargo_XXXX)"
 
   # Build the actual application using Cargo.
   echo "-----> Building application using Cargo"
