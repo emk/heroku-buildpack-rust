@@ -90,10 +90,14 @@ if [ -f "$1/Cargo.toml" ]; then
   fi
   PATH="$cargo_path:$PATH"
 
+  # Make sure we have a fake home directory for the Cargo cache.
+  cargo_home="$2/cargo-home-$CARGO_VERSION"
+  mkdir -p cargo_home
+
   # Build the actual application using Cargo.
   echo "-----> Building application using Cargo"
   cd "$1"
-  cargo build --verbose
+  HOME="$cargo_home" cargo build --verbose
 else
   # Build the actual application using Make.
   echo "-----> Building application using Make"
