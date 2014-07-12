@@ -99,7 +99,7 @@ if [ -f "$1/Cargo.toml" ]; then
   echo "-----> Building application using Cargo"
   echo "       Storing Cargo checkouts in $cargo_home"
   cd "$1"
-  HOME="$cargo_home" cargo build --verbose
+  HOME="$cargo_home" RUST_LOG="cargo::sources::git=debug" cargo build --verbose
 else
   # Build the actual application using Make.
   echo "-----> Building application using Make"
