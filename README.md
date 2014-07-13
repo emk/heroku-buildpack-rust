@@ -15,17 +15,19 @@ migrating to the latter strategy, which is still experimental.
 For detailed instructions, please see
 [Deploying Rust applications to Heroku][instructions], which explains how
 to get everything working. For an example application, see
-`[heroku-rust-hello][]`.  If you really want to use Rust in production on
-Heroku, this method is recommended.  Unfortunately, as everybody migrates
-their libraries to Cargo, it's getting harder to make this work.
+[`heroku-rust-hello`][heroku-rust-hello].  If you really want to use Rust
+in production on Heroku, this method is recommended.  Unfortunately, as
+everybody migrates their libraries to Cargo, it's getting harder to make
+this work.
 
 ### Tracking dependencies with Cargo
 
 There is limited support for Cargo, but it won't be very useful until Cargo
 offers a way to lock down the versions of dependencies.  For an example
-application, see `[heroku-rust-cargo-hello][]`.  In particular, note that
-you need need to use `heroku-buildpack-multi` and `heroku-buildpack-git` to
-upgrade Heroku's copy of `git`, or else Cargo will fail as follows:
+application, see [`heroku-rust-cargo-hello`][heroku-rust-cargo-hello].  In
+particular, note that you need need to use `heroku-buildpack-multi` and
+`heroku-buildpack-git` to upgrade Heroku's copy of `git`, or else Cargo
+will fail as follows:
 
 ``` sh
 fatal: Not a git repository: '.'
