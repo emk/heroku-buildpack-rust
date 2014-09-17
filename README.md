@@ -1,50 +1,24 @@
 This is a replacement for
 [Eric Fode's excellent `heroku-buildpack-rust`][fode], but with support for
-recent Rust nightly builds and experimental support for Cargo.  The
-intention is that this will involve into a production-quality, supported
-buildpack as Rust and Cargo mature.
+recent Rust nightly builds and [Cargo][cargo].  The intention is that this
+will involve into a production-quality, supported buildpack as Rust and
+Cargo mature.
 
-## Two ways to use this buildpack
+[fode]: https://github.com/ericfode/heroku-buildpack-rust
+[cargo]: http://crates.io/
 
-You can track dependencies using either git submodules or [Cargo][cargo].
-The former actually deploys reliably, but most libraries are quickly
-migrating to the latter strategy, which is still experimental.
+## Tracking dependencies with Cargo
 
-### Tracking dependencies with git submodules
+This is now the supported way of using this buildpack.  For instructions
+and example code, see
+[Deploying Rust applications to Heroku, with example code for Iron][instructions]
+and [heroku-rust-cargo-hello][].
 
-For detailed instructions, please see
-[Deploying Rust applications to Heroku][instructions], which explains how
-to get everything working. For an example application, see
-[`heroku-rust-hello`][heroku-rust-hello].  If you really want to use Rust
-in production on Heroku, this method is recommended.  Unfortunately, as
-everybody migrates their libraries to Cargo, it's getting harder to make
-this work.
+The older support for `git submodule`-based projects is deprecated, and
+will be phased out at some point.
 
-### Tracking dependencies with Cargo
-
-There is limited support for Cargo, but it won't be very useful until Cargo
-offers a way to lock down the versions of dependencies.  For an example
-application, see [`heroku-rust-cargo-hello`][heroku-rust-cargo-hello].  In
-particular, note that you need need to use `heroku-buildpack-multi` and
-`heroku-buildpack-git` to upgrade Heroku's copy of `git`, or else Cargo
-will fail as follows:
-
-``` sh
-fatal: Not a git repository: '.'
-Unable to update https://github.com/iron/iron.git
-
-Caused by:
-  Unable to update https://github.com/iron/iron.git
-
-Caused by:
-  Executing `git fetch --force --quiet origin` failed
-
-Caused by:
-  Could not execute process `git fetch --force --quiet origin` (status=128)
-```
-
-As Cargo matures, however, this will eventually become the recommended way
-to use this buildpack.
+[instructions]: http://www.randomhacks.net/2014/09/17/deploying-rust-heroku-iron/
+[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-hello
 
 ## Development notes
 
@@ -80,9 +54,4 @@ cd heroku-rust-cargo-hello
 heroku build -b ../heroku-buildpack-rust
 ```
 
-[fode]: https://github.com/ericfode/heroku-buildpack-rust
-[instructions]: http://www.randomhacks.net/2014/05/30/rust-heroku-rustful/
-[cargo]: http://crates.io/
-[heroku-rust-hello]: https://github.com/emk/heroku-rust-hello
-[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-hello
 [heroku-anvil]: https://github.com/ddollar/heroku-anvil
