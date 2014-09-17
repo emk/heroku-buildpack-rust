@@ -32,7 +32,7 @@ cd "$2"
 # Not sure why we need to do this, but I haven't figured out how to fix
 # the GitHub certificate issues with Cargo yet.
 echo "-----> Disabling SSL certificate verification for Cargo"
-git config --global http.sslVerify false﻿
+export GIT_SSL_NO_VERIFY=no
 
 # Make sure we have the C++ runtime libraries required by the Rust nightly
 # builds.
