@@ -18,7 +18,7 @@ The older support for `git submodule`-based projects is deprecated, and
 will be phased out at some point.
 
 [instructions]: http://www.randomhacks.net/2014/09/17/deploying-rust-heroku-iron/
-[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-hello
+[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-cargo-hello
 
 ## Development notes
 
