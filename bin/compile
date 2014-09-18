@@ -29,10 +29,8 @@ fi
 mkdir -p "$2"
 cd "$2"
 
-# Not sure why we need to do this, but I haven't figured out how to fix
-# the GitHub certificate issues with Cargo yet.
-echo "-----> Disabling SSL certificate verification for Cargo"
-export GIT_SSL_NO_VERIFY=no
+# Work around https://github.com/rust-lang/cargo/issues/598 on Ubuntu 10.04.
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 # Make sure we have the C++ runtime libraries required by the Rust nightly
 # builds.
