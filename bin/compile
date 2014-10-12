@@ -102,9 +102,9 @@ if [ -f "$1/Cargo.toml" ]; then
   echo "-----> Building application using Cargo"
 
   cd "$1"
-  # To debug git issues: 
+  # To debug git issues:
   #export RUST_LOG="cargo::sources::git=debug"
-  HOME="$cargo_home" cargo build --verbose
+  HOME="$cargo_home" cargo build --verbose --release
 else
   # Build the actual application using Make.
   echo "-----> Building application using Make"
