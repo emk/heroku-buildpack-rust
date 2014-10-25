@@ -1,16 +1,4 @@
 #!/usr/bin/env bash
-
-set -e              # fail fast
-set -o pipefail     # dont ignore errors when piping
-# set -x            # enable debugging
-
-# Configure directories
-build_dir=$1
-bp_dir=$(cd $(dirname $0); cd ..; pwd)
-
-# Load some convenience functions like status(), error(), protip() and indent()
-source $bp_dir/bin/common.sh
-
 cat << EOF
 ---
 addons: []

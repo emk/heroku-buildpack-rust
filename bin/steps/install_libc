@@ -1,0 +1,12 @@
+# Make sure we have the C++ runtime libraries required by the Rust nightly
+# builds.
+if [ -f lib/libstdc++.so.6.0.18 ]; then
+  status "Using libstdc++.so.6.0.18"
+else
+  status "Downloading rust-support"
+  rm -rf lib
+  curl -O https://s3.amazonaws.com/rust-builds/rust-support.tar.gz
+  tar xzvf rust-support.tar.gz
+fi
+LD_LIBRARY_PATH="$cache_dir/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH

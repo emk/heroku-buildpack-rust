@@ -1,0 +1,28 @@
+# Load our configuration variables.
+if [ -f "$build_dir/RustConfig" ]; then
+  . "$build_dir/RustConfig"
+else
+  protip "Create RustConfig file and specify URL to point to a Rust and (optionally) Cargo bindary tarball."
+  error "failed: No RustConfig file was found"
+fi
+
+# Check our configuration options.
+if [ -z "$URL" ]; then
+  error "failed: RustConfig must set URL to point to a Rust binary tarball."
+fi
+if [ -z "$VERSION" ]; then
+  error "failed: RustConfig must set VERSION to indicate the Rust version."
+fi
+
+# Check our Cargo configuration options if we have Cargo.toxml.
+if [ -f "$build_dir/Cargo.toml" ]; then
+  status "info: Found Cargo.toml, using it to build project."
+
+  if [ -z "$CARGO_URL" ]; then
+    error "failed: RustConfig must set CARGO_URL to point to a Cargo binary tarball."
+  fi
+  if [ -z "$CARGO_VERSION" ]; then
+    error "failed: RustConfig must set CARGO_VERSION to indicate the Cargo version."
+  fi
+fi
+

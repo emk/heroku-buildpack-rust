@@ -1,3 +1,10 @@
+step() {
+  local name=$1
+  shift
+
+  source $bp_dir/bin/steps/$name
+}
+
 error() {
   echo " !     $*" >&2
   exit 1

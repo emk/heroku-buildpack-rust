@@ -1,0 +1,20 @@
+if [ -d cargo-cache-$CARGO_VERSION ]; then
+  status "Using Cargo version $CARGO_VERSION"
+else
+  status "Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
+
+  rm -f cargo.tar.gz
+  rm -rf cargo-cache-*
+  curl -o cargo.tar.gz "$CARGO_URL"
+
+  status "Extracting Cargo binaries"
+
+  mkdir cargo-cache-$CARGO_VERSION
+  tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
+  rm -r cargo.tar.gz
+fi
+cargo_path=`ls -1d "$cache_dir/cargo-cache-$CARGO_VERSION/"*"/bin"`
+if [ ! -x "$cargo_path/cargo" ]; then
+    error "failed: Cannot find cargo binaries at $cargo_path"
+fi
+PATH="$cargo_path:$PATH"

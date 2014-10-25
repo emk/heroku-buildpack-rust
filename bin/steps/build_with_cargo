@@ -1,0 +1,10 @@
+cargo_home="$cache_dir/cargo-home"
+mkdir -p $cargo_home
+
+# Build the actual application using Cargo.
+status "Building application using Cargo"
+
+cd "$build_dir"
+# To debug git issues:
+#export RUST_LOG="cargo::sources::git=debug"
+HOME="$cargo_home" cargo build --verbose --release | indent
