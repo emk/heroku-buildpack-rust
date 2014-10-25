@@ -95,9 +95,14 @@ status "Setting default LD_LIBRARY_PATH"
 mkdir -p $build_dir/.profile.d
 cat > $build_dir/.profile.d/rust_link_path.sh <<EOF
 # add rustc and project libs to LD_LIBRARY_PATH
-LD_LIBRARY_PATH=./target/release/deps/:./target/release/native/:./rustlib/:\$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=./target/release/deps/:./target/release/native/:./rustlib/:\$LD_LIBRARY_PATH
 EOF
 
+if [ -d "$cache_dir/app-cache" ]; then
+  status "Using cached build artifacts to speedup incremental build"
+  [[ -d "$build_dir/target" ]] && rm -r $build_dir/target
+  cp -r $cache_dir/app-cache $build_dir/target
+fi
 
 if [ -f "$build_dir/Cargo.toml" ]; then
   if [ -d cargo-cache-$CARGO_VERSION ]; then
@@ -124,7 +129,8 @@ if [ -f "$build_dir/Cargo.toml" ]; then
   # Make sure we have a fake home directory for the Cargo cache.  Ideally
   # we would keep these in our cache, but our ".git" directories don't
   # survive between builds.
-  cargo_home="$(mktemp -d -t cargo_XXXX)"
+  cargo_home="$cache_dir/cargo-home"
+  mkdir -p $cargo_home
 
   # Build the actual application using Cargo.
   status "Building application using Cargo"
@@ -139,3 +145,7 @@ else
   cd "$build_dir"
   make | indent
 fi
+
+status "Caching build artifacts"
+[[ -d "$cache_dir/app-cache" ]] && rm -r $cache_dir/app-cache
+cp -r target $cache_dir/app-cache
