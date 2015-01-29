@@ -1,3 +1,3 @@
 status "Caching build artifacts"
 [[ -d "$cache_dir/app-cache" ]] && rm -r $cache_dir/app-cache
-cp -r target $cache_dir/app-cache
+cp -rp target $cache_dir/app-cache
