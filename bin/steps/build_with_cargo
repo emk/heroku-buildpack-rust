@@ -7,4 +7,5 @@ status "Building application using Cargo"
 cd "$build_dir"
 # To debug git issues:
 #export RUST_LOG="cargo::sources::git=debug"
-HOME="$cargo_home" cargo build --verbose --release | indent
+[[ $DOKKU_TRACE ]] && VERBOSE="--verbose" || VERBOSE=""
+HOME="$cargo_home" cargo build $VERBOSE --release | indent
