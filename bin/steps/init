@@ -1,6 +1,6 @@
-set -e              # fail fast
-set -o pipefail     # dont ignore errors when piping
-# set -x            # enable debugging
+set -e                        # fail fast
+set -o pipefail               # dont ignore errors when piping
+[[ $DOKKU_TRACE ]] && set -x  # enable debugging
 
 build_dir=$1
 cache_dir=$2
