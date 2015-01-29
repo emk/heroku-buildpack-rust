@@ -1,0 +1,3 @@
+# Switch to our cache directory.
+mkdir -p "$cache_dir"
+cd "$cache_dir"

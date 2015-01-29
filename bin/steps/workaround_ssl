@@ -1,0 +1,2 @@
+# Work around https://github.com/rust-lang/cargo/issues/598 on Ubuntu 10.04.
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt

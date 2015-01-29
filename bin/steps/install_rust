@@ -1,0 +1,23 @@
+# Make sure we have the correct Rust binaries and set up PATH.
+if [ -d rust-cache-$VERSION ]; then
+  status "Using Rust version $VERSION"
+else
+  status "Downloading Rust version $VERSION binaries from $URL"
+
+  rm -f rust.tar.gz
+  rm -rf rust-cache-*
+  curl -o rust.tar.gz "$URL"
+
+  status "Extracting Rust binaries"
+
+  mkdir rust-cache-$VERSION
+  tar xzf rust.tar.gz -C rust-cache-$VERSION
+  rm -r rust.tar.gz
+fi
+rust_path=`ls -1d "$cache_dir/rust-cache-$VERSION/"*"/"`
+if [ ! -x "$rust_path/bin/rustc" ]; then
+    error "failed: Cannot find rust binaries at $rust_path/bin"
+fi
+PATH="$rust_path/bin:$PATH"
+LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+echo $LD_LIBRARY_PATH | indent

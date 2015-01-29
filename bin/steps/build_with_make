@@ -1,0 +1,4 @@
+# Build the actual application using Make.
+status "Building application using Make"
+cd "$build_dir"
+make | indent

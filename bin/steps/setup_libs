@@ -1,0 +1,12 @@
+# Make sure that our final slug has all required libs from rust
+status "Copying rustlib files"
+[[ -d "$build_dir/rustlib" ]] && rm -r "$build_dir/rustlib"
+cp -r "$rust_path/lib" "$build_dir/rustlib"
+
+# Make sure that LD_LIBRARY_PATH when slug is run points to these libs
+status "Setting default LD_LIBRARY_PATH"
+mkdir -p $build_dir/.profile.d
+cat > $build_dir/.profile.d/rust_link_path.sh <<EOF
+# add rustc and project libs to LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=./target/release/deps/:./target/release/native/:./rustlib/:\$LD_LIBRARY_PATH
+EOF
