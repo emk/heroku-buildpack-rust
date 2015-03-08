@@ -62,36 +62,23 @@ else
   rm -r rust.tar.gz
 fi
 rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/bin/rustc" ]; then
+if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
     echo "failed: Cannot find rust binaries at $rust_path/bin"
     exit 1
 fi
-PATH="$rust_path/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+PATH="$rust_path/rustc/bin:$PATH"
+LD_LIBRARY_PATH="$rust_path/rustc/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
 if [ -f "$1/Cargo.toml" ]; then
-  if [ -d cargo-cache-$CARGO_VERSION ]; then
-    echo "-----> Using Cargo version $CARGO_VERSION"
-  else
-    echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
-
-    rm -f cargo.tar.gz
-    rm -rf cargo-cache-*
-    curl -o cargo.tar.gz "$CARGO_URL"
-
-    echo "-----> Extracting Cargo binaries"
-
-    mkdir cargo-cache-$CARGO_VERSION
-    tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
-    rm -r cargo.tar.gz
-  fi
-  cargo_path=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
-  if [ ! -x "$cargo_path/cargo" ]; then
+  cargo_path=$rust_path/cargo
+  if [ ! -x "$cargo_path/bin" ]; then
       echo "failed: Cannot find cargo binaries at $cargo_path"
       exit 1
   fi
-  PATH="$cargo_path:$PATH"
+  PATH="$cargo_path/bin:$PATH"
+  LD_LIBRARY_PATH="$cargo_path/lib:$LD_LIBRARY_PATH"
+  echo $LD_LIBRARY_PATH
 
   # Make sure we have a fake home directory for the Cargo cache.  Ideally
   # we would keep these in our cache, but our ".git" directories don't
