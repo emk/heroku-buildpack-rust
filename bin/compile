@@ -1,27 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # Load our configuration variables.
 . "$1/RustConfig"
 
 # Check our configuration options.
-if [ -z "$URL" ]; then
-  echo "failed: RustConfig must set URL to point to a Rust binary tarball."
-  exit 1
-fi
 if [ -z "$VERSION" ]; then
   echo "failed: RustConfig must set VERSION to indicate the Rust version."
   exit 1
 fi
-
-# Check our Cargo configuration options if we have Cargo.toxml.
-if [ -f "$1/Cargo.toml" ]; then
-  if [ -z "$CARGO_URL" ]; then
-    echo "failed: RustConfig must set CARGO_URL to point to a Cargo binary tarball."
-    exit 1
-  fi
-  if [ -z "$CARGO_VERSION" ]; then
-    echo "failed: RustConfig must set CARGO_VERSION to indicate the Cargo version."
-    exit 1
+if [ -z "$URL" ]; then
+  # If version is a date, assume a nightly otherwise assume a release
+  if [[ "$VERSION" =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
+    URL="https://static.rust-lang.org/dist/$VERSION/rust-nightly-x86_64-unknown-linux-gnu.tar.gz"
+  else
+    URL="https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz"
   fi
 fi
 
@@ -62,36 +54,50 @@ else
   rm -r rust.tar.gz
 fi
 rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/bin/rustc" ]; then
+if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
     echo "failed: Cannot find rust binaries at $rust_path/bin"
     exit 1
 fi
-PATH="$rust_path/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+PATH="$rust_path/rustc/bin:$PATH"
+LD_LIBRARY_PATH="$rust_path/rustc/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
 if [ -f "$1/Cargo.toml" ]; then
-  if [ -d cargo-cache-$CARGO_VERSION ]; then
-    echo "-----> Using Cargo version $CARGO_VERSION"
+
+  # To be backward compatible use the old cargo url if it is given
+  # And the current rust build does not contain cargo itself
+  # This feature is deprecated
+  if [ -n "$CARGO_URL" ] && [ -n "$CARGO_VERSION" ] && [ ! -d "$rust_path/cargo" ]; then
+    if [ -d cargo-cache-$CARGO_VERSION ]; then
+      echo "-----> Using Cargo version $CARGO_VERSION"
+    else
+      echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
+
+      rm -f cargo.tar.gz
+      rm -rf cargo-cache-*
+      curl -o cargo.tar.gz "$CARGO_URL"
+
+      echo "-----> Extracting Cargo binaries"
+
+      mkdir cargo-cache-$CARGO_VERSION
+      tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
+      rm -r cargo.tar.gz
+    fi
+
+    cargo_path_with_bin=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
+    cargo_path=`dirname "$cargo_path_with_bin"`
   else
-    echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
-
-    rm -f cargo.tar.gz
-    rm -rf cargo-cache-*
-    curl -o cargo.tar.gz "$CARGO_URL"
-
-    echo "-----> Extracting Cargo binaries"
-
-    mkdir cargo-cache-$CARGO_VERSION
-    tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
-    rm -r cargo.tar.gz
+    # Just use cargo from the rust build
+    cargo_path=$rust_path/cargo
   fi
-  cargo_path=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
-  if [ ! -x "$cargo_path/cargo" ]; then
+
+  if [ ! -x "$cargo_path/bin" ]; then
       echo "failed: Cannot find cargo binaries at $cargo_path"
       exit 1
   fi
-  PATH="$cargo_path:$PATH"
+  PATH="$cargo_path/bin:$PATH"
+  LD_LIBRARY_PATH="$cargo_path/lib:$LD_LIBRARY_PATH"
+  echo $LD_LIBRARY_PATH
 
   # Make sure we have a fake home directory for the Cargo cache.  Ideally
   # we would keep these in our cache, but our ".git" directories don't

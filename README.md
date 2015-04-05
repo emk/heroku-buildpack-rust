@@ -42,16 +42,3 @@ ldd heroku-rust-cargo-hello/target/hello
 
 This gives you a system a lot like Heroku's Cedar stack, except that you
 can debug it locally.
-
-### Testing with Anvil
-
-You can also test this buildpack using [heroku-anvil][], which is _almost_
-the same as Heroku's regular build environment.
-
-``` sh
-heroku plugins:install https://github.com/ddollar/heroku-anvil
-cd heroku-rust-cargo-hello
-heroku build -b ../heroku-buildpack-rust
-```
-
-[heroku-anvil]: https://github.com/ddollar/heroku-anvil
