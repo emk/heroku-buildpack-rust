@@ -63,7 +63,34 @@ LD_LIBRARY_PATH="$rust_path/rustc/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
 if [ -f "$1/Cargo.toml" ]; then
-  cargo_path=$rust_path/cargo
+
+  # To be backward compatible use the old cargo url if it is given
+  # And the current rust build does not contain cargo itself
+  # This feature is deprecated
+  if [ -n "$CARGO_URL" ] && [ -n "$CARGO_VERSION" ] && [ ! -d "$rust_path/cargo" ]; then
+    if [ -d cargo-cache-$CARGO_VERSION ]; then
+      echo "-----> Using Cargo version $CARGO_VERSION"
+    else
+      echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
+
+      rm -f cargo.tar.gz
+      rm -rf cargo-cache-*
+      curl -o cargo.tar.gz "$CARGO_URL"
+
+      echo "-----> Extracting Cargo binaries"
+
+      mkdir cargo-cache-$CARGO_VERSION
+      tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
+      rm -r cargo.tar.gz
+    fi
+
+    cargo_path_with_bin=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
+    cargo_path=`dirname "$cargo_path_with_bin"`
+  else
+    # Just use cargo from the rust build
+    cargo_path=$rust_path/cargo
+  fi
+
   if [ ! -x "$cargo_path/bin" ]; then
       echo "failed: Cannot find cargo binaries at $cargo_path"
       exit 1
