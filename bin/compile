@@ -51,11 +51,11 @@ else
 fi
 rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
 if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
-    echo "failed: Cannot find Rust binaries at $rust_path/bin"
+    echo "failed: Cannot find Rust binaries at $rust_path/rustc/bin"
     exit 1
 fi
 PATH="$rust_path/rustc/bin:$rust_path/cargo/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/rustc/lib${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+LD_LIBRARY_PATH="$rust_path/rustc/lib:$rust_path/rustc/lib/rustlib/x86_64-unknown-linux-gnu/lib${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
 echo $LD_LIBRARY_PATH
 
 # Make sure we have a fake home directory for the Cargo cache.  Ideally
