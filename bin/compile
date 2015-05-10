@@ -50,12 +50,12 @@ else
   rm -r rust.tar.gz
 fi
 rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/bin/rustc" ]; then
-    echo "failed: Cannot find rust binaries at $rust_path/bin"
+if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
+    echo "failed: Cannot find Rust binaries at $rust_path/bin"
     exit 1
 fi
 PATH="$rust_path/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
+LD_LIBRARY_PATH="$rust_path/rustc/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
 # Make sure we have a fake home directory for the Cargo cache.  Ideally
