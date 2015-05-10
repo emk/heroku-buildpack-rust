@@ -3,47 +3,35 @@
 # Load our configuration variables.
 . "$1/RustConfig"
 
+# Standard paranoia.
+set -e
+set -u
+
 # Check our configuration options.
-if [ -z "$URL" ]; then
-  echo "failed: RustConfig must set URL to point to a Rust binary tarball."
-  exit 1
-fi
-if [ -z "$VERSION" ]; then
+if [ -z ${VERSION+x} ]; then
   echo "failed: RustConfig must set VERSION to indicate the Rust version."
   exit 1
 fi
+if [ -z ${URL+x} ]; then
+  URL="https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz"
+fi
 
-# Check our Cargo configuration options if we have Cargo.toxml.
-if [ -f "$1/Cargo.toml" ]; then
-  if [ -z "$CARGO_URL" ]; then
-    echo "failed: RustConfig must set CARGO_URL to point to a Cargo binary tarball."
-    exit 1
-  fi
-  if [ -z "$CARGO_VERSION" ]; then
-    echo "failed: RustConfig must set CARGO_VERSION to indicate the Cargo version."
-    exit 1
-  fi
+# Notify users running old, unstable versions of Rust about how to deploy
+# successfully.
+if [ -z ${CARGO_URL+x} ] || [ ! -f "$1/Cargo.toml" ]; then
+    echo <<EOF
+To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
+you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
+using an older version of Rust, and you need to re-deploy an existing
+application, try setting your buildpack to:
+
+  https://github.com/emk/heroku-buildpack-rust.git#old-rust
+EOF
 fi
 
 # Switch to our cache directory.
 mkdir -p "$2"
 cd "$2"
-
-# Work around https://github.com/rust-lang/cargo/issues/598 on Ubuntu 10.04.
-export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-
-# Make sure we have the C++ runtime libraries required by the Rust nightly
-# builds.
-if [ -f lib/libstdc++.so.6.0.18 ]; then
-  echo "-----> Using libstdc++.so.6.0.18"
-else
-  echo "-----> Downloading rust-support"
-  rm -rf lib
-  curl -O https://s3.amazonaws.com/rust-builds/rust-support.tar.gz
-  tar xzvf rust-support.tar.gz
-fi
-LD_LIBRARY_PATH="$2/lib:$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
 
 # Make sure we have the correct Rust binaries and set up PATH.
 if [ -d rust-cache-$VERSION ]; then
@@ -70,44 +58,15 @@ PATH="$rust_path/bin:$PATH"
 LD_LIBRARY_PATH="$rust_path/lib:$LD_LIBRARY_PATH"
 echo $LD_LIBRARY_PATH
 
-if [ -f "$1/Cargo.toml" ]; then
-  if [ -d cargo-cache-$CARGO_VERSION ]; then
-    echo "-----> Using Cargo version $CARGO_VERSION"
-  else
-    echo "-----> Downloading Cargo version $CARGO_VERSION binaries from $CARGO_URL"
+# Make sure we have a fake home directory for the Cargo cache.  Ideally
+# we would keep these in our cache, but our ".git" directories don't
+# survive between builds.
+cargo_home="$(mktemp -d -t cargo_XXXX)"
 
-    rm -f cargo.tar.gz
-    rm -rf cargo-cache-*
-    curl -o cargo.tar.gz "$CARGO_URL"
+# Build the actual application using Cargo.
+echo "-----> Building application using Cargo"
 
-    echo "-----> Extracting Cargo binaries"
-
-    mkdir cargo-cache-$CARGO_VERSION
-    tar xzf cargo.tar.gz -C cargo-cache-$CARGO_VERSION
-    rm -r cargo.tar.gz
-  fi
-  cargo_path=`ls -1d "$2/cargo-cache-$CARGO_VERSION/"*"/bin"`
-  if [ ! -x "$cargo_path/cargo" ]; then
-      echo "failed: Cannot find cargo binaries at $cargo_path"
-      exit 1
-  fi
-  PATH="$cargo_path:$PATH"
-
-  # Make sure we have a fake home directory for the Cargo cache.  Ideally
-  # we would keep these in our cache, but our ".git" directories don't
-  # survive between builds.
-  cargo_home="$(mktemp -d -t cargo_XXXX)"
-
-  # Build the actual application using Cargo.
-  echo "-----> Building application using Cargo"
-
-  cd "$1"
-  # To debug git issues:
-  #export RUST_LOG="cargo::sources::git=debug"
-  HOME="$cargo_home" cargo build --verbose --release
-else
-  # Build the actual application using Make.
-  echo "-----> Building application using Make"
-  cd "$1"
-  make
-fi
+cd "$1"
+# To debug git issues:
+#export RUST_LOG="cargo::sources::git=debug"
+HOME="$cargo_home" cargo build --verbose --release
