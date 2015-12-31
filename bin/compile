@@ -13,7 +13,7 @@ if [ -z ${VERSION+x} ]; then
   exit 1
 fi
 if [ -z ${URL+x} ]; then
-  URL="https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz"
+  URL="https://static.rust-lang.org/rustup.sh"
 fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
@@ -37,25 +37,26 @@ cd "$2"
 if [ -d rust-cache-$VERSION ]; then
   echo "-----> Using Rust version $VERSION"
 else
-  echo "-----> Downloading Rust version $VERSION binaries from $URL"
+  echo "-----> Downloading Rust install script from $URL"
 
   rm -f rust.tar.gz
   rm -rf rust-cache-*
-  curl -o rust.tar.gz "$URL"
+  curl -o rustup.sh "$URL"
+  chmod +x rustup.sh
 
-  echo "-----> Extracting Rust binaries"
+  echo "-----> Installing Rust binaries"
 
   mkdir rust-cache-$VERSION
-  tar xzf rust.tar.gz -C rust-cache-$VERSION
-  rm -r rust.tar.gz
+  ./rustup.sh --prefix=rust-cache-$VERSION -y --revision=$VERSION \
+      --disable-sudo --disable-ldconfig
 fi
-rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
-    echo "failed: Cannot find Rust binaries at $rust_path/rustc/bin"
+rust_path=`ls -1d "$2/rust-cache-$VERSION/"`
+if [ ! -x "$rust_path/bin/rustc" ]; then
+    echo "failed: Cannot find Rust binaries at $rust_path/bin"
     exit 1
 fi
-PATH="$rust_path/rustc/bin:$rust_path/cargo/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/rustc/lib${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+PATH="$rust_path/bin:$rust_path/cargo/bin:$PATH"
+LD_LIBRARY_PATH="$rust_path/lib${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
 
