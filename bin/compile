@@ -1,22 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 
 # Load our configuration variables.
 . "$1/RustConfig"
 
 # Standard paranoia.
-set -e
-set -u
+set -eu
 
 # Check our configuration options.
 if [ -z ${VERSION+x} ]; then
-  echo "failed: RustConfig must set VERSION to indicate the Rust version."
+  >&2 echo "failed: RustConfig must set VERSION to indicate the Rust version."
   exit 1
 fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
-if [ -z ${CARGO_URL+x} ] || [ ! -f "$1/Cargo.toml" ]; then
-    echo <<EOF
+if [ ! -z ${CARGO_URL+x} ] || [ ! -f "$1/Cargo.toml" ]; then
+    >&2 cat <<EOF
 To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
 you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
 using an older version of Rust, and you need to re-deploy an existing
@@ -24,6 +23,17 @@ application, try setting your buildpack to:
 
   https://github.com/emk/heroku-buildpack-rust.git#old-rust
 EOF
+    exit 1
+fi
+
+# Handle people who still aren't using Rustup.
+if [ ! -z ${URL+x} ]; then
+    >&2 cat <<EOF
+heroku-pack-rust has switched to using rustup.  You no longer need a
+URL field in RustConfig. Instead, you should just specify a
+rustup-compatible version (such as `1.11`, `stable` or `nighty`) in VERSION.
+EOF
+    exit 1
 fi
 
 # Switch to our cache directory.
@@ -40,7 +50,7 @@ else
 
   curl -sSf https://static.rust-lang.org/rustup.sh > rustup.sh
   chmod u+x rustup.sh
- 
+
   echo "-----> Extracting Rust binaries"
 
   ./rustup.sh --revision=$VERSION --prefix=$RUST_HOME --disable-sudo
