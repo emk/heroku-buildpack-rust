@@ -12,9 +12,6 @@ if [ -z ${VERSION+x} ]; then
   echo "failed: RustConfig must set VERSION to indicate the Rust version."
   exit 1
 fi
-if [ -z ${URL+x} ]; then
-  URL="https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz"
-fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
@@ -33,31 +30,29 @@ fi
 mkdir -p "$2"
 cd "$2"
 
+RUST_HOME=`pwd`/rust-$VERSION
+
 # Make sure we have the correct Rust binaries and set up PATH.
-if [ -d rust-cache-$VERSION ]; then
+if [ -d $RUST_HOME ]; then
   echo "-----> Using Rust version $VERSION"
 else
-  echo "-----> Downloading Rust version $VERSION binaries from $URL"
+  echo "-----> Downloading rustup and building version $VERSION"
 
-  rm -f rust.tar.gz
-  rm -rf rust-cache-*
-  curl -o rust.tar.gz "$URL"
-
+  curl -sSf https://static.rust-lang.org/rustup.sh > rustup.sh
+  chmod u+x rustup.sh
+ 
   echo "-----> Extracting Rust binaries"
 
-  mkdir rust-cache-$VERSION
-  tar xzf rust.tar.gz -C rust-cache-$VERSION
-  rm -r rust.tar.gz
+  ./rustup.sh --revision=$VERSION --prefix=$RUST_HOME --disable-sudo
+  rm rustup.sh
 fi
-rust_path=`ls -1d "$2/rust-cache-$VERSION/"*"/"`
-if [ ! -x "$rust_path/rustc/bin/rustc" ]; then
-    echo "failed: Cannot find Rust binaries at $rust_path/rustc/bin"
-    exit 1
+
+PATH="$RUST_HOME/bin:$PATH"
+
+if [ ! -x "$RUST_HOME/bin/rustc" ]; then
+  echo "failed: Cannot find Rust binaries at $RUST_HOME"
+  exit 1
 fi
-PATH="$rust_path/rustc/bin:$rust_path/cargo/bin:$PATH"
-LD_LIBRARY_PATH="$rust_path/rustc/lib${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
-echo $LD_LIBRARY_PATH
 
 # Make sure we have a fake home directory for the Cargo cache.  Ideally
 # we would keep these in our cache, but our ".git" directories don't
