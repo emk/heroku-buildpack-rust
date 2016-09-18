@@ -1,23 +1,28 @@
-This is a replacement for
-[Eric Fode's excellent `heroku-buildpack-rust`][fode], but with support for
-recent Rust nightly builds and [Cargo][cargo].  The intention is that this
-will involve into a production-quality, supported buildpack as Rust and
-Cargo mature.
+This is a replacement
+for [Eric Fode's excellent `heroku-buildpack-rust`][fode], but with support
+for [cargo][] and [rustup][], which seems to be the future of Rust
+deployment as of the fall of 2016.
 
 [fode]: https://github.com/ericfode/heroku-buildpack-rust
 [cargo]: http://crates.io/
+[rustup]: https://www.rustup.rs/
 
 ## Tracking dependencies with Cargo
 
-This is now the supported way of using this buildpack.  For instructions
-and example code, see
-[Deploying Rust applications to Heroku, with example code for Iron][instructions]
-and [heroku-rust-cargo-hello][].
+This is now the supported way of using this buildpack.  For an example,
+see [heroku-rust-cargo-hello][].  You will need to create a top-level file
+named `RustConfig` specifying either a channel name:
 
-The older support for `git submodule`-based projects is deprecated, and
-will be phased out at some point.
+```
+VERSION=stable
+```
 
-[instructions]: http://www.randomhacks.net/2014/09/17/deploying-rust-heroku-iron/
+...or a specific version:
+
+```
+VERSION=1.11
+```
+
 [heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-cargo-hello
 
 ## Development notes
