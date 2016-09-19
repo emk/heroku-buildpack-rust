@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Get an example program for testing if we don't have one yet.
+if [ ! -d ./heroku-rust-cargo-hello ]; then
+    git clone https://github.com/emk/heroku-rust-cargo-hello.git
+fi
+
+# Export the current UID so that our child processes can see it.  This will
+# be used as a parameter in our `docker-compose-test.yml` file.
+export UID GROUPS
+
+# Run the build in a Heroku-like environment using `docker-compose`.
+docker-compose -f docker-compose-test.yml up

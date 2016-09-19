@@ -40,39 +40,53 @@ fi
 mkdir -p "$2"
 cd "$2"
 
-RUST_HOME=`pwd`/rust-$VERSION
+# Rustup wants to create `~/.multirust` and fill it with toolchains.  If we
+# set $HOME to our cache directory, it will do the right thing.
+export HOME="`pwd`"
 
-# Make sure we have the correct Rust binaries and set up PATH.
-if [ -d $RUST_HOME ]; then
-  echo "-----> Using Rust version $VERSION"
+# This is where we will cache our downloaded compilers, as well as git
+# repositories downloaded by Cargo.  We implicitly trust Rustup and Cargo
+# to do the right thing when new versions are released.
+export CARGO_HOME="`pwd`/cargo"
+
+# Make sure we have the correct Rust binaries and set up PATH.  We don't
+# skip this step even if $RUST_HOME exists, because rustup may want to
+# update our channel.
+PATH="$CARGO_HOME/bin:$PATH"
+if [ -d "$CARGO_HOME" ]; then
+    echo "-----> Checking for new releases of Rust $VERSION channel"
+    # It's possible that $VERSION has changed, or the `stable` channel has updated.
+    rustup self update
+    rustup update "$VERSION"
+    rustup default "$VERSION"
 else
-  echo "-----> Downloading rustup and building version $VERSION"
-
-  curl -sSf https://static.rust-lang.org/rustup.sh > rustup.sh
-  chmod u+x rustup.sh
-
-  echo "-----> Extracting Rust binaries"
-
-  ./rustup.sh --revision=$VERSION --prefix=$RUST_HOME --disable-sudo
-  rm rustup.sh
+    echo "-----> Downloading rustup"
+    curl https://sh.rustup.rs -sSf > rustup.sh
+    chmod u+x rustup.sh
+    echo "-----> Using rustup to install Rust channel $VERSION"
+    ./rustup.sh -y
+    rm rustup.sh
 fi
-
-PATH="$RUST_HOME/bin:$PATH"
-
-if [ ! -x "$RUST_HOME/bin/rustc" ]; then
-  echo "failed: Cannot find Rust binaries at $RUST_HOME"
+if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
+  echo "failed: Cannot find Rust binaries at $CARGO_HOME"
   exit 1
 fi
 
-# Make sure we have a fake home directory for the Cargo cache.  Ideally
-# we would keep these in our cache, but our ".git" directories don't
-# survive between builds.
-cargo_home="$(mktemp -d -t cargo_XXXX)"
+# This is where we will cache our Rust output.  Note the suggestions at
+# https://github.com/alexcrichton/cargo/commit/014765f788ca1c2476936835ca32cc2746f99b42
+# which describe how this needs to be named.
+export CARGO_TARGET_DIR="$2/target"
 
-# Build the actual application using Cargo.
-echo "-----> Building application using Cargo"
-
-cd "$1"
+# Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
+# back to the source tree.  In theory, we could probably just copy the
+# binary or do something clever with `cargo install`, but we haven't
+# figured that out yet.
+#
 # To debug git issues:
 #export RUST_LOG="cargo::sources::git=debug"
-HOME="$cargo_home" cargo build --release
+# To debug compiler and linking issues, add `--verbose`.
+echo "-----> Building application using Cargo"
+cd "$1"
+rm -rf target/
+cargo build --release
+cp -a "$CARGO_TARGET_DIR" target

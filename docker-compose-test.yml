@@ -1,0 +1,10 @@
+# This is called from ./test_buildpack.
+version: "2"
+services:
+  testbuild:
+    image: "heroku/cedar"
+    volumes:
+      - ".:/src"
+    working_dir: "/src"
+    user: "$UID:$GROUPS"
+    command: ["bin/compile", "/src/heroku-rust-cargo-hello", "/src/cache"]

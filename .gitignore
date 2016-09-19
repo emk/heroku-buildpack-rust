@@ -1,2 +1,3 @@
-/.vagrant
-/cache
+/.vagrant/
+/cache/
+/heroku-rust-cargo-hello/
