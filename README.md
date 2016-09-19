@@ -59,9 +59,10 @@ VERSION=1.11
 
 If you need to tweak this buildpack, the following information may help.
 
-### Testing with Vagrant
+### Testing with Docker
 
-To test changes to the buildpack using the included `Vagrantfile`, run:
+To test changes to the buildpack using the included
+`docker-compose-test.yml`, run:
 
 ```sh
 ./test_buildpack
