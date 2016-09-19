@@ -1,11 +1,10 @@
-This is a replacement
-for [Eric Fode's excellent `heroku-buildpack-rust`][fode], but with support
-for [cargo][] and [rustup][], which seems to be the future of Rust
-deployment as of the fall of 2016.  Features include:
+This is a Heroku buildpack for Rust with support for [cargo][]
+and [rustup][], which seems to be the future of Rust deployment as of the
+fall of 2016.  Features include:
 
 - Caching of builds between deployments.
-- Automatic updates to the latest stable Rust if you specify `stable.
-- Optionally pinning Rust to a specific version.
+- Automatic updates to the latest stable Rust by default.
+- Optional pinning of Rust to a specific version.
 
 For an example project, see [heroku-rust-cargo-hello][].
 
@@ -14,13 +13,25 @@ For an example project, see [heroku-rust-cargo-hello][].
 [rustup]: https://www.rustup.rs/
 [heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-cargo-hello
 
+## Creating a `Procfile`
+
+You will need to create a `Profile` pointing to the release version of your
+application:
+
+```
+web: ./target/release/hello
+```
+
 ## Specifying which version of Rust to use
 
-You will need to create a top-level file named `RustConfig` in your project
-specifying either a channel name:
+By default, your application will be built using the latest stable Rust.
+You may wish to use `nightly` Rust or to lock your Rust version to a
+known-good configuration for more reproducible builds.  To do this, create
+a top-level file named `RustConfig` in your project specifying either a
+channel name:
 
 ```sh
-VERSION=stable
+VERSION=nightly
 ```
 
 ...or a specific version:

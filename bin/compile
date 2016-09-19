@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Load our configuration variables.
-. "$1/RustConfig"
+# Set defaults for our configuration variables.  Stable Rust is sufficiently
+# stable at this point that I think we can just default it.
+VERSION=stable
+
+# Load our configuration variables, if any were specified.
+if [ -f "$1/RustConfig" ]; then
+    . "$1/RustConfig"
+fi
 
 # Standard paranoia.
 set -eu

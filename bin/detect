@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f "$1/RustConfig" ]; then
+if [ -f "$1/RustConfig" ] || [ -f "$1/Cargo.toml" ]; then
     echo "Rust"
     exit 0
 else
