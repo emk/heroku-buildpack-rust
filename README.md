@@ -27,7 +27,7 @@ To use this as the buildpack for an existing application, run:
 heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust.git
 ```
 
-You will also need to create a `Profile` pointing to the release version of
+You will also need to create a `Procfile` pointing to the release version of
 your application:
 
 ```Procfile
