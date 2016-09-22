@@ -5,6 +5,8 @@ fall of 2016.  Features include:
 - Caching of builds between deployments.
 - Automatic updates to the latest stable Rust by default.
 - Optional pinning of Rust to a specific version.
+- Support for `export` so that other buildpacks can access the Rust
+  toolchain.
 
 For an example project, see [heroku-rust-cargo-hello][].
 
