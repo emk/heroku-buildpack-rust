@@ -27,7 +27,7 @@ fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
-if [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/Cargo.toml" ]; then
+if [ $RUST_SKIP_BUILD -ne 1  ] && ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/Cargo.toml" ] ); then
     >&2 cat <<EOF
 To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
 you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
@@ -96,16 +96,20 @@ fi
 # which describe how this needs to be named.
 export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
-# Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
-# back to the source tree.  In theory, we could probably just copy the
-# binary or do something clever with `cargo install`, but we haven't
-# figured that out yet.
-#
-# To debug git issues:
-#export RUST_LOG="cargo::sources::git=debug"
-# To debug compiler and linking issues, add `--verbose`.
-echo "-----> Building application using Cargo"
-cd "$BUILD_DIR"
-rm -rf target/
-cargo build --release
-cp -a "$CARGO_TARGET_DIR" target
+if [ $RUST_SKIP_BUILD -ne 1 ]; then
+  # Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
+  # back to the source tree.  In theory, we could probably just copy the
+  # binary or do something clever with `cargo install`, but we haven't
+  # figured that out yet.
+  #
+  # To debug git issues:
+  #export RUST_LOG="cargo::sources::git=debug"
+  # To debug compiler and linking issues, add `--verbose`.
+  echo "-----> Building application using Cargo"
+  cd "$BUILD_DIR"
+  rm -rf target/
+  cargo build --release
+  cp -a "$CARGO_TARGET_DIR" target
+else
+  echo "-----> Skipping Cargo build"
+fi
