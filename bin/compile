@@ -11,6 +11,11 @@ BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 # stable at this point that I think we can just default it.
 VERSION=stable
 
+# Set this to "1" in `RustConfig` to just install a Rust toolchain and not
+# build `Cargo.toml`.  This is useful if you have a project written in Ruby
+# or Node (for example) that needs to build extension modules using Rust.
+RUST_SKIP_BUILD=0
+
 # Load our configuration variables, if any were specified.
 if [ -f "$BUILD_DIR/RustConfig" ]; then
     . "$BUILD_DIR/RustConfig"
