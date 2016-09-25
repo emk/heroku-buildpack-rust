@@ -6,5 +6,7 @@ services:
     volumes:
       - ".:/src"
     working_dir: "/src"
+    environment:
+      HOME: "/src"
     user: "$UID:$GROUPS"
     command: ["bin/compile", "/src/heroku-rust-cargo-hello", "/src/cache"]
