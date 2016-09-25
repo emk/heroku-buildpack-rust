@@ -104,3 +104,5 @@ ldd heroku-rust-cargo-hello/target/release/hello
 
 This uses the Docker image `heroku/cedar`, which allows us to test in an
 official Cedar-like environment.
+
+We also run this test automatically on Travis CI.
