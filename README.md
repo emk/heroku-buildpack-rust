@@ -5,6 +5,10 @@ fall of 2016.  Features include:
 - Caching of builds between deployments.
 - Automatic updates to the latest stable Rust by default.
 - Optional pinning of Rust to a specific version.
+- Support for `export` so that other buildpacks can access the Rust
+  toolchain.
+- Support for compiling Rust-based extensions for projects written
+  in other languages.
 
 For an example project, see [heroku-rust-cargo-hello][].
 
@@ -53,6 +57,30 @@ VERSION=nightly
 
 ```sh
 VERSION=1.11
+```
+
+## Combining with other buildpacks
+
+If you have a project which combines both Rust and another programming
+language, you can insert this buildpack before your existing one as
+follows:
+
+```sh
+heroku buildpacks:add --index 1 https://github.com/emk/heroku-buildpack-rust.git
+```
+
+If you have a valid `Cargo.toml` in your project, this is all you need to
+do.  The Rust buildpack will run first, and your existing buildpack will
+run second.
+
+
+But if you only need Rust to build a particular Ruby gem, and you have no
+top-level `Cargo.toml` file, you'll need to let the buildpack know to skip
+the build stage.  You can do this by adding the following line to
+`RustConfig`:
+
+```sh
+RUST_SKIP_BUILD=1
 ```
 
 ## Development notes

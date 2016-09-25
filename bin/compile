@@ -1,12 +1,24 @@
 #!/bin/bash
 
+# Find all the directories we might need (based on
+# heroku-buildpack-nodejs code).
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+
 # Set defaults for our configuration variables.  Stable Rust is sufficiently
 # stable at this point that I think we can just default it.
 VERSION=stable
 
+# Set this to "1" in `RustConfig` to just install a Rust toolchain and not
+# build `Cargo.toml`.  This is useful if you have a project written in Ruby
+# or Node (for example) that needs to build extension modules using Rust.
+RUST_SKIP_BUILD=0
+
 # Load our configuration variables, if any were specified.
-if [ -f "$1/RustConfig" ]; then
-    . "$1/RustConfig"
+if [ -f "$BUILD_DIR/RustConfig" ]; then
+    . "$BUILD_DIR/RustConfig"
 fi
 
 # Standard paranoia.
@@ -20,7 +32,7 @@ fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
-if [ ! -z ${CARGO_URL+x} ] || [ ! -f "$1/Cargo.toml" ]; then
+if [ $RUST_SKIP_BUILD -ne 1  ] && ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/Cargo.toml" ] ); then
     >&2 cat <<EOF
 To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
 you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
@@ -42,23 +54,29 @@ EOF
     exit 1
 fi
 
-# Switch to our cache directory.
-mkdir -p "$2"
-cd "$2"
+# Record our Rust build environment configuration in an export file, in
+# case another buildpack needs it to build Ruby gems that use Rust or
+# something like that.
+cat <<EOF > $BP_DIR/export
+# Our rustup installation.
+export RUSTUP_HOME="$CACHE_DIR/multirust"
 
-# Rustup wants to create `~/.multirust` and fill it with toolchains.  If we
-# set $HOME to our cache directory, it will do the right thing.
-export HOME="`pwd`"
-
-# This is where we will cache our downloaded compilers, as well as git
-# repositories downloaded by Cargo.  We implicitly trust Rustup and Cargo
+# Our cargo installation.  We implicitly trust Rustup and Cargo
 # to do the right thing when new versions are released.
-export CARGO_HOME="`pwd`/cargo"
+export CARGO_HOME="$CACHE_DIR/cargo"
 
-# Make sure we have the correct Rust binaries and set up PATH.  We don't
-# skip this step even if $RUST_HOME exists, because rustup may want to
-# update our channel.
-PATH="$CARGO_HOME/bin:$PATH"
+# Include binaries installed by cargo and rustup in our path.
+PATH="\$CARGO_HOME/bin:\$PATH"
+EOF
+
+# Read our build environment back in and evaluate it so that we can use it.
+. $BP_DIR/export
+
+# Switch to our cache directory.
+mkdir -p "$CACHE_DIR"
+cd "$CACHE_DIR"
+
+# Make sure we have an appropriate Rust toolchain installed.
 if [ -d "$CARGO_HOME" ]; then
     echo "-----> Checking for new releases of Rust $VERSION channel"
     # It's possible that $VERSION has changed, or the `stable` channel has updated.
@@ -81,18 +99,22 @@ fi
 # This is where we will cache our Rust output.  Note the suggestions at
 # https://github.com/alexcrichton/cargo/commit/014765f788ca1c2476936835ca32cc2746f99b42
 # which describe how this needs to be named.
-export CARGO_TARGET_DIR="$2/target"
+export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
-# Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
-# back to the source tree.  In theory, we could probably just copy the
-# binary or do something clever with `cargo install`, but we haven't
-# figured that out yet.
-#
-# To debug git issues:
-#export RUST_LOG="cargo::sources::git=debug"
-# To debug compiler and linking issues, add `--verbose`.
-echo "-----> Building application using Cargo"
-cd "$1"
-rm -rf target/
-cargo build --release
-cp -a "$CARGO_TARGET_DIR" target
+if [ $RUST_SKIP_BUILD -ne 1 ]; then
+  # Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
+  # back to the source tree.  In theory, we could probably just copy the
+  # binary or do something clever with `cargo install`, but we haven't
+  # figured that out yet.
+  #
+  # To debug git issues:
+  #export RUST_LOG="cargo::sources::git=debug"
+  # To debug compiler and linking issues, add `--verbose`.
+  echo "-----> Building application using Cargo"
+  cd "$BUILD_DIR"
+  rm -rf target/
+  cargo build --release
+  cp -a "$CARGO_TARGET_DIR" target
+else
+  echo "-----> Skipping Cargo build"
+fi
