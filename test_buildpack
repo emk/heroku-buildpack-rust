@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Standard paranoia.  The `-e` is critical if we want failed tests to be
+# reported on Travis.
+set -euo pipefail
+
 # Get an example program for testing if we don't have one yet.
 if [ ! -d ./heroku-rust-cargo-hello ]; then
     git clone https://github.com/emk/heroku-rust-cargo-hello.git
