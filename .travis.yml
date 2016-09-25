@@ -1,5 +1,8 @@
-os: linux
-sudo: required
+os: "linux"
+sudo: "required"
 services:
-- docker
-script: "./test_buildpack"
+- "docker"
+script:
+# Test both pristine and cached deploys.
+- "./test_buildpack"
+- "./test_buildpack"
