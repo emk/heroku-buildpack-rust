@@ -19,11 +19,18 @@ For an example project, see [heroku-rust-cargo-hello][].
 
 ## Using this buildpack
 
-If you're creating a new Heroku application, run:
+To deploy an application to Heroku, we recommend installing the [Heroku CLI][].
+
+If you're creating a new Heroku application, `cd` to the directory
+containing your code, and run:
 
 ```sh
 heroku create --buildpack https://github.com/emk/heroku-buildpack-rust.git
 ```
+
+This will only work if your application has a `Cargo.toml` and uses `git`.
+If you want to set a particular name for application, see `heroku create
+--help` first.
 
 To use this as the buildpack for an existing application, run:
 
@@ -32,11 +39,19 @@ heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust.git
 ```
 
 You will also need to create a `Procfile` pointing to the release version of
-your application:
+your application, and commit it to `git`:
 
 ```Procfile
 web: ./target/release/hello
 ```
+
+To deploy your application, run:
+
+```sh
+git push heroku master
+```
+
+[Heroku CLI]: https://devcenter.heroku.com/articles/heroku-command-line
 
 ## Specifying which version of Rust to use
 
