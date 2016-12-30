@@ -88,7 +88,7 @@ else
     curl https://sh.rustup.rs -sSf > rustup.sh
     chmod u+x rustup.sh
     echo "-----> Using rustup to install Rust channel $VERSION"
-    ./rustup.sh -y
+    ./rustup.sh -y --default-toolchain "$VERSION"
     rm rustup.sh
 fi
 if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
