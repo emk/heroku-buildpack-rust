@@ -7,6 +7,11 @@ CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
+# Export DATABASE_URL at build time, mostly because Diesel is the best way to
+# do SQL in Rust right now, and Diesel will use it to generated code for the
+# database schema.
+export DATABASE_URL="$(cat $ENV_DIR/DATABASE_URL)";
+
 # Set defaults for our configuration variables.  Stable Rust is sufficiently
 # stable at this point that I think we can just default it.
 VERSION=stable
