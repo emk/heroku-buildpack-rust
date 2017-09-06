@@ -71,7 +71,7 @@ VERSION=nightly
 ...or a specific version:
 
 ```sh
-VERSION=1.11
+VERSION=1.20.0
 ```
 
 ## Combining with other buildpacks
