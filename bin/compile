@@ -22,6 +22,9 @@ VERSION=stable
 # build `Cargo.toml`.  This is useful if you have a project written in Ruby
 # or Node (for example) that needs to build extension modules using Rust.
 RUST_SKIP_BUILD=0
+# If your Rust code is not at the root directory of the repository, specify a
+# `BUILD_PATH` to the correct directory in the `RustConfig`
+BUILD_PATH=""
 
 # Load our configuration variables, if any were specified.
 if [ -f "$BUILD_DIR/RustConfig" ]; then
@@ -39,7 +42,7 @@ fi
 
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
-if [ $RUST_SKIP_BUILD -ne 1  ] && ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/Cargo.toml" ] ); then
+if [ $RUST_SKIP_BUILD -ne 1  ] && ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/$BUILD_PATH/Cargo.toml" ] ); then
     >&2 cat <<EOF
 To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
 you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
@@ -118,7 +121,7 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   #export RUST_LOG="cargo::sources::git=debug"
   # To debug compiler and linking issues, add `--verbose`.
   echo "-----> Building application using Cargo"
-  cd "$BUILD_DIR"
+  cd "$BUILD_DIR/$BUILD_PATH"
   rm -rf target/
   cargo build --release
   mkdir -p target/release
