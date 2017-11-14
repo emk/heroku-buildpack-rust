@@ -60,19 +60,12 @@ Normally, this is pretty safe: New stable Rust releases have excellent
 backwards compatibility.
 
 But you may wish to use `nightly` Rust or to lock your Rust version to a
-known-good configuration for more reproducible builds.  To do this, create
-a top-level file named `RustConfig` in your project specifying either a
-channel name:
+known-good configuration for more reproducible builds. To specify a specific
+version of the toolchain, use a [`rust-toolchain`](https://github.com/rust-lang-nursery/rustup.rs#the-toolchain-file) file in the format rustup
+uses.
 
-```sh
-VERSION=nightly
-```
-
-...or a specific version:
-
-```sh
-VERSION=1.20.0
-```
+Note: if you previously specified a `VERSION` variable in `RustConfig`, that will continue to work,
+and will override a `rust-toolchain` file.
 
 ## Combining with other buildpacks
 

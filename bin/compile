@@ -26,6 +26,11 @@ RUST_SKIP_BUILD=0
 # `BUILD_PATH` to the correct directory in the `RustConfig`
 BUILD_PATH=""
 
+# Load our toolchain configuration, if any was specified.
+if [ -f "$BUILD_DIR/rust-toolchain" ]; then
+    VERSION=$(cat $BUILD_DIR/rust-toolchain)
+fi
+
 # Load our configuration variables, if any were specified.
 if [ -f "$BUILD_DIR/RustConfig" ]; then
     . "$BUILD_DIR/RustConfig"
@@ -36,7 +41,7 @@ set -eu
 
 # Check our configuration options.
 if [ -z ${VERSION+x} ]; then
-  >&2 echo "failed: RustConfig must set VERSION to indicate the Rust version."
+  >&2 echo "failed: must set VERSION with rust-toolchain or RustConfig to indicate the Rust version."
   exit 1
 fi
 
