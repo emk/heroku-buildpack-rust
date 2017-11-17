@@ -28,7 +28,7 @@ BUILD_PATH=""
 
 # Load our toolchain configuration, if any was specified.
 if [ -f "$BUILD_DIR/rust-toolchain" ]; then
-    VERSION=$(cat $BUILD_DIR/rust-toolchain)
+    VERSION="$(cat $BUILD_DIR/rust-toolchain)"
 fi
 
 # Load our configuration variables, if any were specified.
