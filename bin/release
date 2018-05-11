@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 echo "---
 default_process_types:
-  web: cargo run --release"
+  web: cargo run"
