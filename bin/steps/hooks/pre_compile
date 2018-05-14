@@ -3,5 +3,5 @@
 if [ -f bin/pre_compile ]; then
     echo "-----> Running pre-compile hook"
     chmod +x bin/pre_compile
-    sub_env bin/pre_compile
+    source bin/pre_compile
 fi

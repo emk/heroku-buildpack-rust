@@ -9,10 +9,6 @@ BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 # (based on heroku/heroku-buildpack-python)
 BIN_DIR=$(cd "$(dirname "$0")"; pwd) # absolute path
 
-# Import the utils script, which contains helper functions used throughout the buildpack.
-# shellcheck source=bin/utils
-source "$BIN_DIR/utils"
-
 # Export DATABASE_URL at build time, mostly because Diesel is the best way to
 # do SQL in Rust right now, and Diesel will use it to generated code for the
 # database schema.
