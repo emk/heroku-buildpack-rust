@@ -131,11 +131,11 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   # To debug git issues:
   #export RUST_LOG="cargo::sources::git=debug"
   # To debug compiler and linking issues, add `--verbose`.
-  echo "-----> Building application using Cargo"
   cd "$BUILD_DIR/$BUILD_PATH"
   # pre compilation hook
   source "$BIN_DIR/steps/hooks/pre_compile"
   rm -rf target/
+  echo "-----> Building application using Cargo"
   cargo build --release
   mkdir -p target/release
   find "$CARGO_TARGET_DIR/release" -maxdepth 1 -type f -executable -exec cp -a -t target/release {} \;
