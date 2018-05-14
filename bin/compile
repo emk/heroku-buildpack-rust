@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# Find all the directories we might need (based on
-# heroku-buildpack-nodejs code).
+# Find all the directories we might need
+# (based on heroku/heroku-buildpack-nodejs)
 BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+# (based on heroku/heroku-buildpack-python)
+BIN_DIR=$(cd "$(dirname "$0")"; pwd) # absolute path
+
+# Import the utils script, which contains helper functions used throughout the buildpack.
+# shellcheck source=bin/utils
+source "$BIN_DIR/utils"
 
 # Export DATABASE_URL at build time, mostly because Diesel is the best way to
 # do SQL in Rust right now, and Diesel will use it to generated code for the
@@ -127,10 +133,14 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   # To debug compiler and linking issues, add `--verbose`.
   echo "-----> Building application using Cargo"
   cd "$BUILD_DIR/$BUILD_PATH"
+  # pre compilation hook
+  source "$BIN_DIR/steps/hooks/pre_compile"
   rm -rf target/
   cargo build --release
   mkdir -p target/release
   find "$CARGO_TARGET_DIR/release" -maxdepth 1 -type f -executable -exec cp -a -t target/release {} \;
+  # post compilation hook
+  source "$BIN_DIR/steps/hooks/post_compile"
 else
   echo "-----> Skipping Cargo build"
 fi

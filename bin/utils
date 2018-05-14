@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# ref: https://github.com/heroku/heroku-buildpack-python/blob/master/bin/utils
+
+# The standard library.
+if [[ ! -f  /tmp/stdlib.sh ]]; then
+  curl --retry 3 -s https://lang-common.s3.amazonaws.com/buildpack-stdlib/v8/stdlib.sh > /tmp/stdlib.sh
+fi
+# shellcheck source=/dev/null
+source /tmp/stdlib.sh

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+pwd
+ls
+ls bin/
+
+if [ -f bin/pre_compile ]; then
+    echo "-----> Running pre-compile hook"
+    chmod +x bin/pre_compile
+    sub_env bin/pre_compile
+fi
