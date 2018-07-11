@@ -51,6 +51,22 @@ To deploy your application, run:
 git push heroku master
 ```
 
+### Running Diesel migrations during the release phase
+
+This will install the diesel CLI at build time and make it available in your dyno.
+Migrations will run whenever a new version of your app is released. Add the
+following line to your `RustConfig`
+
+```sh
+RUST_INSTALL_DIESEL=1
+```
+
+and this one to your `Procfile`
+
+```Procfile
+release: ./target/release/diesel migration run
+```
+
 [Heroku CLI]: https://devcenter.heroku.com/articles/heroku-command-line
 
 ## Specifying which version of Rust to use
