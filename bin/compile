@@ -147,6 +147,4 @@ if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
   echo "-----> Installing diesel"
   cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
   cp $(which diesel) target/release/
-else
-  echo "-----> Skipping diesel install"
 fi
