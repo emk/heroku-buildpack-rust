@@ -25,7 +25,7 @@ If you're creating a new Heroku application, `cd` to the directory
 containing your code, and run:
 
 ```sh
-heroku create --buildpack https://github.com/emk/heroku-buildpack-rust.git
+heroku create --buildpack emk/rust
 ```
 
 This will only work if your application has a `Cargo.toml` and uses `git`.
@@ -35,7 +35,7 @@ If you want to set a particular name for application, see `heroku create
 To use this as the buildpack for an existing application, run:
 
 ```sh
-heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust.git
+heroku buildpacks:set emk/rust
 ```
 
 You will also need to create a `Procfile` pointing to the release version of
@@ -90,7 +90,7 @@ language, you can insert this buildpack before your existing one as
 follows:
 
 ```sh
-heroku buildpacks:add --index 1 https://github.com/emk/heroku-buildpack-rust.git
+heroku buildpacks:add --index 1 emk/rust
 ```
 
 If you have a valid `Cargo.toml` in your project, this is all you need to
@@ -105,6 +105,14 @@ the build stage.  You can do this by adding the following line to
 
 ```sh
 RUST_SKIP_BUILD=1
+```
+
+## Using the edge version of the buildpack
+
+The `emk/rust` buildpack from the [Heroku Registry](https://devcenter.heroku.com/articles/buildpack-registry) contains the latest stable version of the buildpack. If you'd like to use the latest buildpack code from this Github repository, you can set your buildpack to the Github URL:
+
+```sh-session
+$ heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust
 ```
 
 ## Development notes
