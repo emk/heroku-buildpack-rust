@@ -1,6 +1,5 @@
 This is a Heroku buildpack for Rust with support for [cargo][]
-and [rustup][], which seems to be the future of Rust deployment as of the
-fall of 2016.  Features include:
+and [rustup][].  Features include:
 
 - Caching of builds between deployments.
 - Automatic updates to the latest stable Rust by default.
