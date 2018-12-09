@@ -9,12 +9,12 @@ and [rustup][].  Features include:
 - Support for compiling Rust-based extensions for projects written
   in other languages.
 
-For an example project, see [heroku-rust-cargo-hello][].
+For an example project, see [rust-buildpack-example-actix][].
 
 [fode]: https://github.com/ericfode/heroku-buildpack-rust
 [cargo]: http://crates.io/
 [rustup]: https://www.rustup.rs/
-[heroku-rust-cargo-hello]: https://github.com/emk/heroku-rust-cargo-hello
+[rust-buildpack-example-actix]: https://github.com/emk/rust-buildpack-example-actix
 
 ## Using this buildpack
 
@@ -43,6 +43,8 @@ your application, and commit it to `git`:
 ```Procfile
 web: ./target/release/hello
 ```
+
+...where `hello` is the name of your binary.
 
 To deploy your application, run:
 
@@ -95,7 +97,6 @@ heroku buildpacks:add --index 1 emk/rust
 If you have a valid `Cargo.toml` in your project, this is all you need to
 do.  The Rust buildpack will run first, and your existing buildpack will
 run second.
-
 
 But if you only need Rust to build a particular Ruby gem, and you have no
 top-level `Cargo.toml` file, you'll need to let the buildpack know to skip

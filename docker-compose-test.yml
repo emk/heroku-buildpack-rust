@@ -9,4 +9,4 @@ services:
     environment:
       HOME: "/src"
     user: "$UID:$GROUPS"
-    command: ["bin/compile", "/src/heroku-rust-cargo-hello", "/src/cache"]
+    command: ["bin/compile", "/src/rust-buildpack-example-actix", "/src/cache"]

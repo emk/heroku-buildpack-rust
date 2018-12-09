@@ -5,8 +5,8 @@
 set -euo pipefail
 
 # Get an example program for testing if we don't have one yet.
-if [ ! -d ./heroku-rust-cargo-hello ]; then
-    git clone https://github.com/emk/heroku-rust-cargo-hello.git
+if [ ! -d ./rust-buildpack-example-actix ]; then
+    git clone https://github.com/emk/rust-buildpack-example-actix.git
 fi
 
 # Export the current UID so that our child processes can see it.  This will
