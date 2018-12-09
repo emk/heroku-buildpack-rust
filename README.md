@@ -19,7 +19,7 @@ Here are several example projects:
 
 [rust-buildpack-example-actix]: https://github.com/emk/rust-buildpack-example-actix
 [Actix]: https://actix.rs/
-[rust-buildpack-example-actix]: https://github.com/emk/rust-buildpack-example-rocket
+[rust-buildpack-example-rocket]: https://github.com/emk/rust-buildpack-example-rocket
 [Rocket]: https://rocket.rs/
 
 ## Using this buildpack
