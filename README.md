@@ -1,3 +1,7 @@
+# Heroku buildpack for Rust
+
+[![Build Status](https://travis-ci.org/emk/heroku-buildpack-rust.svg?branch=master)](https://travis-ci.org/emk/heroku-buildpack-rust)
+
 This is a Heroku buildpack for Rust with support for [cargo][] and [rustup][].  Features include:
 
 - Caching of builds between deployments.
@@ -98,8 +102,8 @@ RUST_SKIP_BUILD=1
 
 The `emk/rust` buildpack from the [Heroku Registry](https://devcenter.heroku.com/articles/buildpack-registry) contains the latest stable version of the buildpack. If you'd like to use the latest buildpack code from this Github repository, you can set your buildpack to the Github URL:
 
-```sh-session
-$ heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust
+```sh
+heroku buildpacks:set https://github.com/emk/heroku-buildpack-rust
 ```
 
 ## Development notes
