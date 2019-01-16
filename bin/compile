@@ -88,7 +88,7 @@ export RUSTUP_HOME="$CACHE_DIR/multirust"
 export CARGO_HOME="$CACHE_DIR/cargo"
 
 # Include binaries installed by cargo and rustup in our path.
-PATH="\$CARGO_HOME/bin:\$PATH"
+PATH="$CARGO_HOME/bin:$PATH"
 
 # Read our build environment back in and evaluate it so that we can use it.
 
