@@ -76,7 +76,7 @@ EOF
 mkdir -p "$CACHE_DIR"
 cd "$CACHE_DIR"
 
-if $(which rustup); then
+if which rustup; then
   rustup self update
   rustup update
 else
