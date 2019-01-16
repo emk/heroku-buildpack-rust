@@ -72,13 +72,18 @@ PATH="$CARGO_HOME/bin:$PATH"
 mkdir -p "$CACHE_DIR"
 cd "$CACHE_DIR"
 
-# Make sure we have an appropriate Rust toolchain installed.
-echo "-----> Downloading rustup"
-curl https://sh.rustup.rs -sSf > rustup.sh
-chmod u+x rustup.sh
-echo "-----> Using rustup to install Rust channel $VERSION"
-./rustup.sh -y --default-toolchain "$VERSION"
-rm rustup.sh
+if $(which rustup); then
+  rustup self update
+  rustup update
+else
+  # Make sure we have an appropriate Rust toolchain installed.
+  echo "-----> Downloading rustup"
+  curl https://sh.rustup.rs -sSf > rustup.sh
+  chmod u+x rustup.sh
+  echo "-----> Using rustup to install Rust channel $VERSION"
+  ./rustup.sh -y --default-toolchain "$VERSION"
+  rm rustup.sh
+fi
 
 if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
   echo "failed: Cannot find Rust binaries at $CARGO_HOME"
