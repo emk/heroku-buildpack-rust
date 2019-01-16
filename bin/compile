@@ -113,8 +113,11 @@ mkdir -p "$CACHE_DIR"
 cd "$CACHE_DIR"
 
 if which rustup; then
+  echo "-----> Checking for new releases of Rust $VERSION channel"
+  # It's possible that $VERSION has changed, or the `stable` channel has updated.
   rustup self update
-  rustup update
+  rustup update "$VERSION"
+  rustup default "$VERSION"
 else
   # Make sure we have an appropriate Rust toolchain installed.
   echo "-----> Downloading rustup"
