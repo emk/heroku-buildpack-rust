@@ -76,8 +76,6 @@ EOF
     exit 1
 fi
 
-# Read our build environment back in and evaluate it so that we can use it.
-. $BP_DIR/export
 # Record our Rust build environment configuration in an export file, in
 cat <<EOF > $BP_DIR/export
 # Our rustup installation.
@@ -89,6 +87,8 @@ export CARGO_HOME="$CACHE_DIR/cargo"
 PATH="\$CARGO_HOME/bin:\$PATH"
 EOF
 
+# Read our build environment back in and evaluate it so that we can use it.
+. $BP_DIR/export
 # case another buildpack needs it to build Ruby gems that use Rust or
 # something like that.
 
