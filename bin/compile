@@ -79,7 +79,7 @@ fi
 # Record our Rust build environment configuration in an export file, in
 # case another buildpack needs it to build Ruby gems that use Rust or
 # something like that.
-cat <<EOF > $BP_DIR/export
+
 # Our rustup installation.
 export RUSTUP_HOME="$CACHE_DIR/multirust"
 
@@ -89,10 +89,8 @@ export CARGO_HOME="$CACHE_DIR/cargo"
 
 # Include binaries installed by cargo and rustup in our path.
 PATH="\$CARGO_HOME/bin:\$PATH"
-EOF
 
 # Read our build environment back in and evaluate it so that we can use it.
-. $BP_DIR/export
 
 # Switch to our cache directory.
 mkdir -p "$CACHE_DIR"
