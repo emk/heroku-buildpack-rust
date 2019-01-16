@@ -59,14 +59,18 @@ fi
 # Our rustup installation.
 export RUSTUP_HOME="$CACHE_DIR/multirust"
 
+cat <<EOF > $BP_DIR/export
+# Our rustup installation.
+export RUSTUP_HOME="$CACHE_DIR/multirust"
 # Our cargo installation.  We implicitly trust Rustup and Cargo
 # to do the right thing when new versions are released.
 export CARGO_HOME="$CACHE_DIR/cargo"
-
 # Include binaries installed by cargo and rustup in our path.
-PATH="$CARGO_HOME/bin:$PATH"
+PATH="\$CARGO_HOME/bin:\$PATH"
+EOF
 
 # Read our build environment back in and evaluate it so that we can use it.
+. $BP_DIR/export
 
 # Switch to our cache directory.
 mkdir -p "$CACHE_DIR"
