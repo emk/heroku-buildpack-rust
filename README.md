@@ -98,6 +98,10 @@ But if you only need Rust to build a particular Ruby gem, and you have no top-le
 RUST_SKIP_BUILD=1
 ```
 
+## Customizing build flags
+
+By default the command line used to build the rust binary is `cargo build --release`.
+
 ## Using the edge version of the buildpack
 
 The `emk/rust` buildpack from the [Heroku Registry](https://devcenter.heroku.com/articles/buildpack-registry) contains the latest stable version of the buildpack. If you'd like to use the latest buildpack code from this Github repository, you can set your buildpack to the Github URL:
