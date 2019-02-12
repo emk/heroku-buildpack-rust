@@ -100,7 +100,14 @@ RUST_SKIP_BUILD=1
 
 ## Customizing build flags
 
-By default the command line used to build the rust binary is `cargo build --release`.
+If you want to change the cargo build command, you can set the `RUST_CARGO_BUILD_FLAGS` variable inside the `RustConfig` file.
+
+```sh
+RUST_CARGO_BUILD_FLAGS="--release -p some_package --bin some_exe --bin some_bin_2"
+```
+
+The default value of `RUST_CARGO_BUILD_FLAGS` is `--release`.
+If the variable is not set in `RustConfig`, the default value will be used to build the project.
 
 ## Using the edge version of the buildpack
 

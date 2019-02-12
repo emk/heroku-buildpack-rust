@@ -32,8 +32,8 @@ BUILD_PATH=""
 RUST_INSTALL_DIESEL=0
 # These flags are passed to `cargo install diesel`, e.g. '--no-default-features --features postgres'
 DIESEL_FLAGS=""
-# `CARGO_BUILD_FLAGS` default build command
-CARGO_BUILD_FLAGS=""
+# Default build flags to pass to `cargo build`.
+RUST_CARGO_BUILD_FLAGS="--release"
 
 # Load our toolchain configuration, if any was specified.
 if [ -f "$BUILD_DIR/rust-toolchain" ]; then
@@ -137,7 +137,7 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   echo "-----> Building application using Cargo"
   cd "$BUILD_DIR/$BUILD_PATH"
   rm -rf target/
-  cargo build "$CARGO_BUILD_FLAGS"
+  cargo build $RUST_CARGO_BUILD_FLAGS
   mkdir -p target/release
   find "$CARGO_TARGET_DIR/release" -maxdepth 1 -type f -executable -exec cp -a -t target/release {} \;
 else
