@@ -54,6 +54,7 @@ if [ -z ${VERSION+x} ]; then
   exit 1
 fi
 
+
 # Notify users running old, unstable versions of Rust about how to deploy
 # successfully.
 if [ $RUST_SKIP_BUILD -ne 1  ] && ( [ ! -z ${CARGO_URL+x} ] || [ ! -f "$BUILD_DIR/$BUILD_PATH/Cargo.toml" ] ); then
@@ -62,7 +63,6 @@ To deploy a modern Rust app, make sure you have a Cargo.toml file, and that
 you do not define CARGO_URL or CARGO_VERSION in RustConfig.  If you're
 using an older version of Rust, and you need to re-deploy an existing
 application, try setting your buildpack to:
-
   https://github.com/emk/heroku-buildpack-rust.git#old-rust
 EOF
     exit 1
@@ -79,16 +79,30 @@ EOF
 fi
 
 # Record our Rust build environment configuration in an export file, in
-# case another buildpack needs it to build Ruby gems that use Rust or
-# something like that.
 cat <<EOF > $BP_DIR/export
 # Our rustup installation.
 export RUSTUP_HOME="$CACHE_DIR/multirust"
-
 # Our cargo installation.  We implicitly trust Rustup and Cargo
 # to do the right thing when new versions are released.
 export CARGO_HOME="$CACHE_DIR/cargo"
+# Include binaries installed by cargo and rustup in our path.
+PATH="\$CARGO_HOME/bin:\$PATH"
+EOF
 
+# Read our build environment back in and evaluate it so that we can use it.
+. $BP_DIR/export
+# case another buildpack needs it to build Ruby gems that use Rust or
+# something like that.
+
+# Our rustup installation.
+export RUSTUP_HOME="$CACHE_DIR/multirust"
+
+cat <<EOF > $BP_DIR/export
+# Our rustup installation.
+export RUSTUP_HOME="$CACHE_DIR/multirust"
+# Our cargo installation.  We implicitly trust Rustup and Cargo
+# to do the right thing when new versions are released.
+export CARGO_HOME="$CACHE_DIR/cargo"
 # Include binaries installed by cargo and rustup in our path.
 PATH="\$CARGO_HOME/bin:\$PATH"
 EOF
@@ -100,21 +114,22 @@ EOF
 mkdir -p "$CACHE_DIR"
 cd "$CACHE_DIR"
 
-# Make sure we have an appropriate Rust toolchain installed.
-if [ -d "$CARGO_HOME" ]; then
-    echo "-----> Checking for new releases of Rust $VERSION channel"
-    # It's possible that $VERSION has changed, or the `stable` channel has updated.
-    rustup self update
-    rustup update "$VERSION"
-    rustup default "$VERSION"
+if which rustup; then
+  echo "-----> Checking for new releases of Rust $VERSION channel"
+  # It's possible that $VERSION has changed, or the `stable` channel has updated.
+  rustup self update
+  rustup update "$VERSION"
+  rustup default "$VERSION"
 else
-    echo "-----> Downloading rustup"
-    curl https://sh.rustup.rs -sSf > rustup.sh
-    chmod u+x rustup.sh
-    echo "-----> Using rustup to install Rust channel $VERSION"
-    ./rustup.sh -y --default-toolchain "$VERSION"
-    rm rustup.sh
+  # Make sure we have an appropriate Rust toolchain installed.
+  echo "-----> Downloading rustup"
+  curl https://sh.rustup.rs -sSf > rustup.sh
+  chmod u+x rustup.sh
+  echo "-----> Using rustup to install Rust channel $VERSION"
+  ./rustup.sh -y --default-toolchain "$VERSION"
+  rm rustup.sh
 fi
+
 if [ ! -x "$CARGO_HOME/bin/rustc" ]; then
   echo "failed: Cannot find Rust binaries at $CARGO_HOME"
   exit 1
