@@ -34,6 +34,8 @@ RUST_INSTALL_DIESEL=0
 DIESEL_FLAGS=""
 # Default build flags to pass to `cargo build`.
 RUST_CARGO_BUILD_FLAGS="--release"
+# Set this to "1" in `RustConfig` to rebuild dependencies when rustc is updated to a new version
+RUST_CLEAR_CARGO_CACHE_ON_NEW_VERSION=0
 
 # Load our toolchain configuration, if any was specified.
 if [ -f "$BUILD_DIR/rust-toolchain" ]; then
@@ -125,6 +127,29 @@ fi
 # which describe how this needs to be named.
 export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
+# If RUST_CLEAR_CARGO_CACHE_ON_NEW_VERSION is 1 and the cached contents of $CACHE_DIR/cargo/registry/src
+# were built with a different version of Rust then delete contents of $CACHE_DIR/cargo/registry/src
+# and $CARGO_TARGET_DIR so crates are rebuilt.
+CURRENT_RUSTC_VERSION="$(rustc --version)"
+
+if [ $RUST_CLEAR_CARGO_CACHE_ON_NEW_VERSION -eq 1 ]; then
+  CACHED_RUSTC_VERSION="NO PREVIOUS VERSION KEY"
+
+  if [ -s $CACHE_DIR/rustc_version.txt ]; then
+    CACHED_RUSTC_VERSION="$(cat $CACHE_DIR/rustc_version.txt)"
+  fi
+
+
+  if test "$CACHED_RUSTC_VERSION" != "$CURRENT_RUSTC_VERSION"
+  then
+    echo "-----> Cached Cargo dependencies built with $CACHED_RUSTC_VERSION. Current version is $CURRENT_RUSTC_VERSION"
+    echo "-----> Deleting $CACHE_DIR/cargo/registry"
+    rm -rf $CACHE_DIR/cargo/registry/src
+    echo "-----> Deleting $CARGO_TARGET_DIR"
+    rm -rf $CARGO_TARGET_DIR
+  fi
+fi
+
 if [ $RUST_SKIP_BUILD -ne 1 ]; then
   # Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
   # back to the source tree.  In theory, we could probably just copy the
@@ -138,6 +163,7 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   cd "$BUILD_DIR/$BUILD_PATH"
   rm -rf target/
   cargo build $RUST_CARGO_BUILD_FLAGS
+  echo $CURRENT_RUSTC_VERSION > $CACHE_DIR/rustc_version.txt
   mkdir -p target/release
   find "$CARGO_TARGET_DIR/release" -maxdepth 1 -type f -executable -exec cp -a -t target/release {} \;
 else
