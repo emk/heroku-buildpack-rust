@@ -153,6 +153,8 @@ if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
   echo $(ls target/release/)
   echo $BUILD_DIR
   echo $CACHE_DIR
+  echo $(ls $BUILD_DIR/)
+  echo $(ls $CACHE_DIR/)
   echo $(ls $BUILD_DIR/target/)
   echo $(ls $BUILD_DIR/target/release/)
   cp $(which diesel) target/release/
