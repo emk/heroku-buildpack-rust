@@ -148,6 +148,7 @@ fi
 if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
   echo "-----> Installing diesel"
   cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
+  mkdir -p $BUILD_DIR/target/release/
   echo $(which diesel)
   echo $(ls)
   echo $(ls target/release/)
