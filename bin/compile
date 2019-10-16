@@ -78,6 +78,8 @@ EOF
     exit 1
 fi
 
+eval "$(ssh-agent -s)" && ssh-add
+
 # Record our Rust build environment configuration in an export file, in
 # case another buildpack needs it to build Ruby gems that use Rust or
 # something like that.
