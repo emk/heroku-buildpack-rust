@@ -125,6 +125,12 @@ fi
 # which describe how this needs to be named.
 export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
+# Pre-compile script
+if [[ -v RUST_PRECOMPILE ]]; then
+  echo "-----> Precompile"
+  eval $RUST_PRECOMPILE
+fi
+
 if [ $RUST_SKIP_BUILD -ne 1 ]; then
   # Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
   # back to the source tree.  In theory, we could probably just copy the
@@ -149,4 +155,10 @@ if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
   echo "-----> Installing diesel"
   cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
   cp $(which diesel) target/release/
+fi
+
+# Post-compile script
+if [[ -v RUST_POSTCOMPILE ]]; then
+  echo "-----> Postcompile"
+  eval $RUST_POSTCOMPILE
 fi
