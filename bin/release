@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# bin/release <build-dir>
+# This script provides feedback metadata to Cloud Foundry indicating how the app should be executed
+
+echo -e "---\ndefault_process_types:\n  web: '>&2 echo Please specify a default start command for this buildpack && exit 1'"
