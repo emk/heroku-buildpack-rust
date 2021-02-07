@@ -20,11 +20,14 @@ Here are several example projects:
 
 - [rust-buildpack-example-actix][] uses the popular [Actix][] framework, and runs on stable Rust.
 - [rust-buildpack-example-rocket][] uses the innovative [Rocket][] framework, which currently requires nightly Rust.
+- [rust-buildpack-example-warp][] uses the super-easy [Warp][] framework, and runs on stable Rust.
 
 [rust-buildpack-example-actix]: https://github.com/emk/rust-buildpack-example-actix
 [Actix]: https://actix.rs/
 [rust-buildpack-example-rocket]: https://github.com/emk/rust-buildpack-example-rocket
 [Rocket]: https://rocket.rs/
+[rust-buildpack-example-warp]: https://github.com/qalens/rust-buildpack-example-warp
+[Warp]: https://docs.rs/warp
 
 ## Using this buildpack
 
