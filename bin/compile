@@ -7,13 +7,6 @@ CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
-# Export DATABASE_URL at build time, mostly because Diesel is the best way to
-# do SQL in Rust right now, and Diesel will use it to generate code for the
-# database schema.
-if [ -e "$ENV_DIR/DATABASE_URL" ]; then
-  export DATABASE_URL="$(cat $ENV_DIR/DATABASE_URL)";
-fi
-
 # Set defaults for our configuration variables.  Stable Rust is sufficiently
 # stable at this point that I think we can just default it.
 VERSION=stable
@@ -32,8 +25,18 @@ BUILD_PATH=""
 RUST_INSTALL_DIESEL=0
 # These flags are passed to `cargo install diesel`, e.g. '--no-default-features --features postgres'
 DIESEL_FLAGS=""
+# Set this to "1" in `RustConfig` to install sqlx at build time and copy it
+# into the target directory, next to your app binary. This makes it easy to
+# run migrations by adding a release step to your Procfile:
+# `release: ./target/release/sqlx migration run`
+RUST_INSTALL_SQLX=0
+# These flags are passed to `cargo install sqlx`, e.g. '--no-default-features --features postgres'
+SQLX_FLAGS=""
+
 # Default build flags to pass to `cargo build`.
 RUST_CARGO_BUILD_FLAGS="--release"
+# With SQLX, I guedd we would like to use offline build as the default
+SQLX_OFFLINE="true"
 
 # Load our toolchain configuration, if any was specified.
 if [ -f "$BUILD_DIR/rust-toolchain" ]; then
@@ -42,7 +45,15 @@ fi
 
 # Load our configuration variables, if any were specified.
 if [ -f "$BUILD_DIR/RustConfig" ]; then
-    . "$BUILD_DIR/RustConfig"
+    echo "---> Reading RustConfig"
+    . "$BUILD_DIR/RustConfig"    
+fi
+
+# Export DATABASE_URL at build time, mostly because Diesel is the best way to
+# do SQL in Rust right now, and Diesel will use it to generate code for the
+# database schema.
+if [ -e "$ENV_DIR/DATABASE_URL" ]; then
+  export DATABASE_URL="$(cat $ENV_DIR/DATABASE_URL)";
 fi
 
 # Standard paranoia.
@@ -125,6 +136,9 @@ fi
 # which describe how this needs to be named.
 export CARGO_TARGET_DIR="$CACHE_DIR/target"
 
+## In case of SQLX, we need to update the SQLX_OFFLINE 
+export SQLX_OFFLINE="$SQLX_OFFLINE"
+
 if [ $RUST_SKIP_BUILD -ne 1 ]; then
   # Build our project (into CARGO_TARGET_DIR so we have caching) and copy it
   # back to the source tree.  In theory, we could probably just copy the
@@ -149,4 +163,11 @@ if [ $RUST_INSTALL_DIESEL -eq 1 ]; then
   echo "-----> Installing diesel"
   cargo install diesel_cli $DIESEL_FLAGS || echo "already installed"
   cp $(which diesel) target/release/
+fi
+
+# Install sqlx sqo we can use it for migrations
+if [ $RUST_INSTALL_SQLX -eq 1 ]; then
+  echo "-----> Installing sqlx"
+  cargo install sqlx-cli $SQLX_FLAGS || echo "already installed"
+  cp $(which sqlx) target/release/
 fi

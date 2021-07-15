@@ -58,7 +58,9 @@ To deploy your application, run:
 git push heroku master
 ```
 
-### Running Diesel migrations during the release phase
+### Running migrations during the release phase
+
+#### Diesel
 
 This will install the diesel CLI at build time and make it available in your dyno. Migrations will run whenever a new version of your app is released. Add the following line to your `RustConfig`
 
@@ -70,6 +72,32 @@ and this one to your `Procfile`
 
 ```Procfile
 release: ./target/release/diesel migration run
+```
+
+To customize the installation options, set the `DIESEL_FLAGS` in the `RustConfig`:
+
+```sh
+DIESEL_FLAGS="--no-default-features --features postgres"
+```
+
+#### SQLx
+
+This will install the SQLx CLI at build time and make it available in your dyno. Migrations will run whenever a new version of your app is released. Add the following line to your `RustConfig`
+
+```sh
+RUST_INSTALL_SQLX=1
+```
+
+and this one to your `Procfile`
+
+```Procfile
+release: ./target/release/sqlx mig run
+```
+
+To customize the installation options, set the `SQLX_FLAGS` in the `RustConfig`:
+
+```sh
+SQLX_FLAGS="--no-default-features --features postgres"
 ```
 
 [Heroku CLI]: https://devcenter.heroku.com/articles/heroku-command-line
