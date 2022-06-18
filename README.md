@@ -113,7 +113,9 @@ If the variable is not set in `RustConfig`, the default value will be used to bu
 
 If you want to set variables that are needed at build time, prefix the variable with ```BUILDVAR_``` when adding to Heroku Config Vars. 
 
-```$ heroku config:set BUILDVAR_API_KEY=myapikey```
+```sh
+$ heroku config:set BUILDVAR_API_KEY=myapikey
+```
 
 ## Using the edge version of the buildpack
 
