@@ -14,6 +14,21 @@ if [ -e "$ENV_DIR/DATABASE_URL" ]; then
   export DATABASE_URL="$(cat $ENV_DIR/DATABASE_URL)";
 fi
 
+## Export BUILDVAR_ variables at build time. 
+## Useful in cases where application sets variables at build time. 
+## E.g. static API_KEY: &str = env!("BUILDVAR_API_KEY");
+if ls "$ENV_DIR" 2>/dev/null | grep -q -e ^BUILDVAR_; then
+  echo "-----> Found BUILDVAR_ variable(s)"
+  for BUILDVAR in $(ls "$ENV_DIR" | grep -e ^BUILDVAR_); do
+    VAR_KEY=$BUILDVAR
+    VAR_VALUE=$(cat $ENV_DIR/$BUILDVAR)
+    echo "-----> Exporting $VAR_KEY"
+    export "$VAR_KEY=$VAR_VALUE"
+  done
+else
+  echo "-----> Found no BUILDVAR_ variable"
+fi
+
 # Set defaults for our configuration variables.  Stable Rust is sufficiently
 # stable at this point that I think we can just default it.
 VERSION=stable

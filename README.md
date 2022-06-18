@@ -109,6 +109,14 @@ RUST_CARGO_BUILD_FLAGS="--release -p some_package --bin some_exe --bin some_bin_
 The default value of `RUST_CARGO_BUILD_FLAGS` is `--release`.
 If the variable is not set in `RustConfig`, the default value will be used to build the project.
 
+## Set variables to use during build
+
+If you want to set variables that are needed at build time, prefix the variable with ```BUILDVAR_``` when adding to Heroku Config Vars. 
+
+```sh
+$ heroku config:set BUILDVAR_API_KEY=myapikey
+```
+
 ## Using the edge version of the buildpack
 
 The `emk/rust` buildpack from the [Heroku Registry](https://devcenter.heroku.com/articles/buildpack-registry) contains the latest stable version of the buildpack. If you'd like to use the latest buildpack code from this Github repository, you can set your buildpack to the Github URL:
