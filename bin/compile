@@ -33,7 +33,7 @@ RUST_INSTALL_DIESEL=0
 # These flags are passed to `cargo install diesel`, e.g. '--no-default-features --features postgres'
 DIESEL_FLAGS=""
 # Default build flags to pass to `cargo build`.
-RUST_CARGO_BUILD_FLAGS="--release"
+RUST_CARGO_BUILD_FLAGS="--release --example heroku-deploy"
 
 # Load our toolchain configuration, if any was specified.
 if [ -f "$BUILD_DIR/rust-toolchain" ]; then
