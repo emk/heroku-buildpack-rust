@@ -138,7 +138,6 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   cd "$BUILD_DIR/$BUILD_PATH"
   rm -rf target/
   cargo build --release --example heroku-deploy
-  mkdir -p target/release
 else
   echo "-----> Skipping Cargo build"
 fi
