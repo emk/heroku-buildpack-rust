@@ -140,7 +140,6 @@ if [ $RUST_SKIP_BUILD -ne 1 ]; then
   cargo build $RUST_CARGO_BUILD_FLAGS
   mkdir -p target/release
   find "$CARGO_TARGET_DIR/release" -maxdepth 2 -type f -executable -exec cp -a -t target/release {} \;
-  ls target/release/
 else
   echo "-----> Skipping Cargo build"
 fi
