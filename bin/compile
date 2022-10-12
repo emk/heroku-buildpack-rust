@@ -7,6 +7,12 @@ CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
+# Export SQLX_OFFLINE at build time, this is used in case we are using compile time
+# checked and want to use the prepared metadata in sqlx-data.json
+if [ -e "$ENV_DIR/SQLX_OFFLINE" ]; then
+  export SQLX_OFFLINE="$(cat $ENV_DIR/SQLX_OFFLINE)";
+fi
+
 # Export DATABASE_URL at build time, mostly because Diesel is the best way to
 # do SQL in Rust right now, and Diesel will use it to generate code for the
 # database schema.
