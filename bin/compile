@@ -101,7 +101,7 @@ mkdir -p "$CACHE_DIR"
 cd "$CACHE_DIR"
 
 # Make sure we have an appropriate Rust toolchain installed.
-if [ -d "$CARGO_HOME" ]; then
+if which rustup; then
     echo "-----> Checking for new releases of Rust $VERSION channel"
     # It's possible that $VERSION has changed, or the `stable` channel has updated.
     rustup self update
