@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << EOF
+---
+addons:
+config_vars:
+  PATH: /app/bin:/usr/local/bin:/usr/bin:/bin
+default_process_types:
+  web: cargo run
+EOF
